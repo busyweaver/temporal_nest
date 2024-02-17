@@ -136,14 +136,19 @@ def stats_numberrewirings_conv(path, names, look_aheads, iterations, cut, folder
                             tmp[a[2]] = 1
                         else:
                             tmp[a[2]] += 1
-                    d_time[e[0]][lo][i] = tmp        
+                    d_time[e[0]][lo][i] = tmp
                     d[e[0]][lo][i] = len(possible_rewire)
 #                 del keep[0]
                 save_dic( folder+e[1]+"_"+str(lo)+"_"+str(cut)+"_keep" , keep)
-                save_dic( folder+e[1]+"_"+str(lo)+"_"+str(cut)+"_exec_time" , d_exec[e[0]])
+                #save_dic( folder+e[1]+"_"+str(lo)+"_"+str(cut)+"_exec_time" , d_exec[e[0]])
                 save_dic( folder+e[1]+"_"+str(lo)+"_"+str(cut)+"_rewire" , d[e[0]][lo])
                 save_dic( folder+e[1]+"_"+str(lo)+"_"+str(cut)+"_time" , d_time[e[0]][lo])
+                del d[e[0]][lo]
+                del d_time[e[0]][lo]
             save_dic( folder+e[1]+"_"+str(lo)+"_"+str(cut)+"_exec_time" , d_exec[e[0]])
+            del d_exec[e[0]]
+            del d[e[0]]
+            del d_time[e[0]]
         else:
             print(e, "already present")
 #     return d, d_con, d_time, keep
