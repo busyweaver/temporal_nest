@@ -5,7 +5,6 @@
 
 
 from graph_characteristics_lib import *
-import pickle
 import os
 import sys
 
@@ -13,18 +12,10 @@ path = "datasets/networks/"
 names = [ ["highschool_2011", "hs11", "purple","u"], ["hospital_ward", "hw", "blue","u"], ["ht09", "ht","red","u"], ["workplace_2013", "wp", "green","u"],
          ["dblp", "dblp", "brown","d"], ["college", "college", "magenta","d"], ["opsahl", "opsahl", "black","d"],
          ["email-eu", "eu", "yellow","d"] ]
-look_aheads = [0,0.2,0.4,0.6,0.8,1]
+look_aheads = [0.0,0.2,0.4,0.6,0.8,1]
 iterations = 1
 cut = float(sys.argv[1])
 print("cut", cut)
-def save_dic(s,d):
-    with open(s+".pkl","wb") as f:
-        pickle.dump(d,f)
-    
-def read_dic(s):
-    with open(s+".pkl", 'rb') as f:
-        d = pickle.load(f)
-    return d
 
 def find_sep(x):
     for s in x:
@@ -34,7 +25,6 @@ def find_sep(x):
 
 
 def read_graph(path,s, dire):
-#     print("read",s)
     g = set()
     f = open(path+s+".csv", "r")
     sep = find_sep(f.readline())
@@ -66,7 +56,7 @@ fig, axs = plt.subplots(2,4)
 for k in range(len(names)):
     e = names[k]
     g = read_graph(path,e[0],e[-1])
-    g = graph_cut(g,cut)
+    g = graph_cut(g,names[k][-1],cut)
     i = k//2
     j = k%2
     d = seq_graphs(g)
@@ -91,14 +81,35 @@ fig.set_size_inches(15, 10)
 fig.savefig(folder_res+"edge_dist.eps", dpi=150)
 fig.show()
 
+import re
+
+def find_max_wl(folder, name):
+    pattern = re.compile("^("+name+"_"+"[0-9]+"+".pkl)")
+    files = [f for f in os.listdir(folder) if os.path.isfile(folder+f) and pattern.match(folder+f)]
+    m = 1
+    for e in files:
+        i = -5
+        tmp = ""
+        current = e[i]
+        while current != "_":
+            tmp += current
+            i -= 1
+            current = e[i]
+        val = int(tmp)
+        if val > m:
+            m = val
+    return m
+
+
+
 
 # In[3]:
 
 
 #do not change the look aheads sequence
 import time
-def stats_numberrewirings_conv(path, names, look_aheads, iterations, cut, folderg):
-    if not os.path.exists(folder): 
+def stats_numberrewirings_conv(path, names, look_aheads, iterations, cut, folder):
+    if not os.path.exists(folder):
         os.makedirs(folder)
     files = [f for f in os.listdir(folder) if os.path.isfile(folder+f)]
     d_exec = dict()
@@ -106,49 +117,47 @@ def stats_numberrewirings_conv(path, names, look_aheads, iterations, cut, folder
     d_con = dict()
     d_time = dict()
     for e in names:
-        d[e[0]] = dict()
-        d_time[e[0]] = dict()
-        d_con[e[0]] = dict()
-        d_exec[e[0]] = dict()
+        d = dict()
+        d_time = dict()
+        d_con = dict()
+        d_exec = dict()
         g = read_graph(path,e[0],e[-1])
-        g_new = graph_cut(g,cut)
+        g_new = graph_cut(g,e[-1],cut)
 #         for i in range(iterations+1):
 #             print(d,e[0],i)
         if not e[1]+"_"+str(look_aheads[0])+"_"+str(cut)+"_rewire.pkl" in files:
             print("compute wl for", e[0])
             for lo in look_aheads:
                 start = time.time()
-                _, col, keep, con = weisfeiler_lehman_graph_hash(g_new,iterations = -1, keep_iterations=True, reverse = False, look_ahead = lo)
+                _, col, _, con = weisfeiler_lehman_graph_hash(g_new,iterations = -1, reverse = False, look_ahead = lo, save_each_step = True, name_save = folder+e[1]+"_"+str(lo)+"_"+str(cut)+"_keep")
     #             print(col,keep)
                 end = time.time()
-                d[e[0]][lo] = dict()
-                d_exec[e[0]][lo] = end-start
-                d_time[e[0]][lo] = dict()
-                d_con[e[0]][lo] = con
-                for i in keep.keys():
+                d[lo] = dict()
+                d_exec[lo] = end-start
+                d_time[lo] = dict()
+                d_con[lo] = con
+                max_it = find_max_wl(folder, folder+e[1]+"_"+str(lo)+"_"+str(cut)+"_keep")
+                for i in range(1,max_it+1):
     #                 print("keep",len(keep))
     #                 print("i",i, "j",j, "keep",len(keep))
     #                 possible_rewire,_ = list_rewirings(g_new,keep[j])
-                    possible_rewire = rewirings(g_new,keep[i], e[-1])
+                    keep = read_dic(folder+e[1]+"_"+str(lo)+"_"+str(cut)+"_keep_"+str(i))
+                    possible_rewire = rewirings(g_new,keep, e[-1])
                     tmp = dict()
                     for (a,b) in possible_rewire:
                         if a[2] not in tmp:
                             tmp[a[2]] = 1
                         else:
                             tmp[a[2]] += 1
-                    d_time[e[0]][lo][i] = tmp
-                    d[e[0]][lo][i] = len(possible_rewire)
+                    d_time[lo][i] = tmp
+                    d[lo][i] = len(possible_rewire)
 #                 del keep[0]
-                save_dic( folder+e[1]+"_"+str(lo)+"_"+str(cut)+"_keep" , keep)
+                #save_dic(folder+e[1]+"_"+str(lo)+"_"+str(cut)+"_keep" , keep)
                 #save_dic( folder+e[1]+"_"+str(lo)+"_"+str(cut)+"_exec_time" , d_exec[e[0]])
-                save_dic( folder+e[1]+"_"+str(lo)+"_"+str(cut)+"_rewire" , d[e[0]][lo])
-                save_dic( folder+e[1]+"_"+str(lo)+"_"+str(cut)+"_time" , d_time[e[0]][lo])
-                del d[e[0]][lo]
-                del d_time[e[0]][lo]
-            save_dic( folder+e[1]+"_"+str(lo)+"_"+str(cut)+"_exec_time" , d_exec[e[0]])
-            del d_exec[e[0]]
-            del d[e[0]]
-            del d_time[e[0]]
+                save_dic( folder+e[1]+"_"+str(lo)+"_"+str(cut)+"_rewire" , d[lo])
+                save_dic( folder+e[1]+"_"+str(lo)+"_"+str(cut)+"_time" , d_time[lo])
+
+            save_dic( folder+e[1]+"_"+str(lo)+"_"+str(cut)+"_exec_time" , d_exec)
         else:
             print(e, "already present")
 #     return d, d_con, d_time, keep
@@ -172,14 +181,16 @@ def write_characteristics_table(folder, folder_values, names, cut):
         for k in range(len(names)):
             e = names[k]
             g = read_graph(path,e[0],e[-1])
-            g = graph_cut(g,cut)
+            g = graph_cut(g,e[-1],cut)
             ev = events(g)
             nb_temp_edges = len(g)
             nod = nodes(g)
             nb_nodes = len(nod)
             rew_dic = read_dic(folder_values+e[1]+"_"+str(1)+"_"+str(cut)+"_rewire")
             exec_dic = read_dic(folder_values+e[1]+"_"+str(1)+"_"+str(cut)+"_exec_time")
-            m = max(rew_dic.keys())
+            name_keep = folder_values+names[k][1]+"_"+str(1)+"_"+str(cut)+"_keep"
+            m = find_max_wl(folder_values, name_keep)
+            #m = max(rew_dic.keys())
             fg.write(e[1]+" & "+ e[3]+ " & " +str(nb_nodes)+" & "+str(len(ev))+
                      " & "+str(nb_temp_edges)+" & "+str(m)+ " & " +str(exec_dic[1])[:5] + " & "+ str(rew_dic[m])+ "\\\\ \n")
         fg.close()
@@ -199,9 +210,12 @@ for k in range(len(names)):
 #     print(names[k][0])
     dd = dict()
     for e in look_aheads:
-        f = folder+names[k][1]+"_"+str(e)+"_"+str(cut)+"_"+str_dict[0]
+        name_keep = folder+names[k][1]+"_"+str(e)+"_"+str(cut)+"_keep"
+        max_wl = find_max_wl(folder, name_keep)
+        f = read_dic(name_keep+"_"+str(max_wl))
+        f2 = read_dic(name_keep+"_"+str(1))
 #         print("look for", f)
-        dd[e] = read_dic(f)
+        dd[e] = {1: f, max_wl : f2 }
 #         print(dd[e])
 #         print(max(dd[e].keys()))
     i = k//2
@@ -349,7 +363,6 @@ for k in range(len(names)):
     i = k//2
     j = k%2
     axs[j, i].set_title(names[k][1])
-    
     color = iter(cm.rainbow(np.linspace(0, 1, len(look_aheads))))
     l1 = []
     l2 = []
@@ -361,14 +374,12 @@ for k in range(len(names)):
             l1.append(s1)
         else:
             l1.append(-1)
-            
         if len(dd[a][m_it].keys())!=0 :
             m_ev2 = max(dd[a][m_it].keys())
             s2 = float(sum( (e/m_ev2)*dd[a][m_it][e]  for e in dd[a][m_it].keys() )/sum(dd[a][m_it].values()))
             l2.append(s2)
         else:
             l2.append(-1)
-            
     c = next(color)
     axs[j, i].scatter( look_aheads ,l1, alpha=1/2, color = c, label= "iter 0 ")
     c = next(color)
@@ -388,6 +399,7 @@ fig.show()
 
 
 def statistics_rewirings(path,names,cut,nb_rewire, folder, folder_res,wl_it = -1,look_ahead = 1):
+    print("stats rewirings")
     files = [f for f in os.listdir(folder_res) if os.path.isfile(folder_res+f)]
     s = "table_charac.tex"
     if s not in files:
@@ -395,16 +407,15 @@ def statistics_rewirings(path,names,cut,nb_rewire, folder, folder_res,wl_it = -1
         for k in range(0,len(names)):
             print("statistics_rewirings",  names[k][0])
             g = read_graph(path,names[k][0], names[k][-1])
-            g_new = graph_cut(g,cut)
-    #         print(g_new)
+            g_new = graph_cut(g,names[k][-1], cut)
             m = max(events(g_new))
-            keep = dict()
-            f = folder+names[k][1]+"_"+str(look_ahead)+"_"+str(cut)+"_"+str_dict[0]
-            keep = read_dic(f)
-            if wl_it == -1:
-                col = keep[ max(keep.keys()) ]
-            else:
-                col = keep[w_it]
+            names_keep = folder+names[k][1]+"_"+str(1)+"_"+str(cut)+"_keep"
+            max_wl = max_it = find_max_wl(folder, names_keep)
+            col = read_dic(names_keep+"_"+str(max_wl))
+            # if wl_it == -1:
+            #     col = keep[ max(keep.keys()) ]
+            # else:
+            #     col = keep[w_it]
 
     #         _, col, _, _ = weisfeiler_lehman_graph_hash(g_new, iterations = wl_it,  look_ahead = look_ahead)
             nb = len(rewirings(g_new,col, names[k][-1]))
@@ -431,6 +442,7 @@ def statistics_rewirings(path,names,cut,nb_rewire, folder, folder_res,wl_it = -1
 
 
 def statistics_rewirings_diff(path,names,cut,nb_rewire,iter_pandemy,folder, folder_res, wl_it = -1,look_ahead = 1):
+    print("stats diffusion")
     files = [f for f in os.listdir(folder_res) if os.path.isfile(folder_res+f)]
     s = "table_diff_"+str(iter_pandemy)+".tex"
     if s not in files:
@@ -438,12 +450,11 @@ def statistics_rewirings_diff(path,names,cut,nb_rewire,iter_pandemy,folder, fold
         for k in range(0,len(names)):
             print("diffusion ", names[k][0])
             g = read_graph(path,names[k][0], names[k][-1])
-            g_new = graph_cut(g,cut)
-    #         print(g_new)
+            g_new = graph_cut(g,names[k][-1],cut)
             m = max(events(g_new))
-            keep = dict()
-            f = folder+names[k][1]+"_"+str(look_ahead)+"_"+str(cut)+"_"+str_dict[0]
-            keep = read_dic(f)
+            names_keep = folder+names[k][1]+"_"+str(1)+"_"+str(cut)+"_keep"
+            max_wl = max_it = find_max_wl(folder, names_keep)
+            col = read_dic(names_keep+"_"+str(max_wl))
             if wl_it == -1:
                 col = keep[ max(keep.keys()) ]
             else:

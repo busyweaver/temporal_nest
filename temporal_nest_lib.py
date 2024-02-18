@@ -5,6 +5,16 @@ from collections import Counter, defaultdict
 from hashlib import blake2b
 from functools import reduce
 
+import pickle
+
+def save_dic(s,d):
+    with open(s+".pkl","wb") as f:
+        pickle.dump(d,f)
+def read_dic(s):
+    with open(s+".pkl", 'rb') as f:
+        d = pickle.load(f)
+    return d
+
 def graphs_equality(g,r):
     for e in g:
         if e not in r:
@@ -25,6 +35,14 @@ def nodes(g):
         no.add(a)
         no.add(b)
     return no
+
+
+def is_undirected(g):
+    sg = set(g)
+    for (u,v,t) in sg:
+        if (v,u,t) not in sg:
+            return False
+    return True
 
 def to_undirected(g):
     gs = set(g)
@@ -142,13 +160,15 @@ def graph_time(g,t):
             res.add((a,b,tp))
     return res
 
-def graph_cut(g, tau):
+def graph_cut(g, dire, tau):
     lg = list(g)
     lgo = [ [e[2],e] for e in lg ]
     lgo.sort()
     lgo = [ e[1] for e in lgo ]
     val = int(len(lgo)*tau)
     g_new = lgo[:val]
+    if dire == "u":
+        g_new = to_undirected(g_new)
     return g_new
 
 
@@ -205,8 +225,7 @@ def check_convergence_node_labels(new,old):
     return True
 
 def weisfeiler_lehman_graph_hash(
-    G, iterations = -1, digest_size=16, keep_iterations=False, reverse = False, look_ahead = 1 
-):
+        G, iterations = -1, digest_size=16, keep_iterations=False, reverse = False, look_ahead = 1, save_each_step = False, name_save = ""):
     def weisfeiler_lehman_step(G, labels, reverse, look_ahead):
         """
         Apply neighborhood aggregation to each node
@@ -229,9 +248,11 @@ def weisfeiler_lehman_graph_hash(
     # set initial node labels
     node_labels = _init_node_labels(G, reverse, look_ahead)
     keep = { 1: {e:node_labels[e]   for e in itertools.product(nodes(G),[i for i in ev])} }
+    if save_each_step:
+        save_dic(name_save+"_"+str(1) , node_labels)
     subgraph_hash_counts = []
     i = -1
-    for i in range(iterations):
+    for i in range(1,iterations +1):
 #         print(i)
         node_labels_new = weisfeiler_lehman_step(G, node_labels, reverse, look_ahead)
         counter = Counter(node_labels_new.values())
@@ -242,7 +263,9 @@ def weisfeiler_lehman_graph_hash(
             break
         else:
             if keep_iterations:
-                keep[i+1] = {e:node_labels[e]   for e in itertools.product(nodes(G),[i for i in ev])} 
+                keep[i+1] = {e:node_labels[e]   for e in itertools.product(nodes(G),[i for i in ev])}
+            if save_each_step:
+                save_dic(name_save+"_"+str(i+1) , node_labels)
             node_labels = node_labels_new
 
     # hash the final counter
@@ -412,6 +435,7 @@ def check_rewire_all(g,rewire):
     return True
 
 def rewiring_one(g_new, rewire, se, dire):
+    #print("rewiring_one")
 #     check_seq_g(g_new,se)
 #     check_rewire_all(g_new,rewire)
     su = 0
@@ -428,11 +452,10 @@ def rewiring_one(g_new, rewire, se, dire):
             if i < 0:
                 break
         (a,b,t),(c,d,tp) = rewire[lk[j]][i]
-#         print("selected", (a,b,t),(c,d,tp), "direc", dire)
+
         g_new.remove((a,b,t))
         if dire=="u":
             g_new.remove((b,a,t))
-            
         se[t].remove((a,b))
         if dire=="u":
             se[t].remove((b,a))
@@ -448,14 +471,13 @@ def rewiring_one(g_new, rewire, se, dire):
         g_new.add((a,d,t))
         if dire=="u":
             g_new.add((d,a,t))
-            
-        g_new.add((c,b,tp))
-        if dire=="u":
-            g_new.add((b,c,tp))
-            
         se[t].add((a,d))
         if dire=="u":
             se[t].add((d,a))
+
+        g_new.add((c,b,tp))
+        if dire=="u":
+            g_new.add((b,c,tp))
         
         se[tp].add((c,b))
         if dire=="u":
@@ -466,6 +488,7 @@ def rewiring_one(g_new, rewire, se, dire):
 
 def rewire_any(gg,n,col,dire):
     g = set(gg.copy())
+    #print(g, is_undirected(g))
     rewire = dict()
     se = seq_graphs(g)
     ev = events(g)
@@ -481,17 +504,9 @@ def rewire_any(gg,n,col,dire):
         g,se,t,tp = rewiring_one(g,rewire,se,dire)
         if t != -1:
             rewire[t] = list(rewirings_at_time(se,col,t))
-                
-#             print("eince")
-#             rewire[t] = list(rewirings_at_time(se,col,t, only_inter))
-#             check_rewire_all(g,rewire)
-#             print("end")
-#             if t != tp:
-#                 print("tsvie")
-#                 rewire[tp] = list(rewirings_at_time(se,col,tp, only_inter))
-#                 check_rewire_all(g,rewire)
-#                 print("end")
-#             print("rewire[t]",rewire[t])
+            if t != tp:
+                rewire[tp] = list(rewirings_at_time(se,col,tp))
+
     return list(g)
 
 def nb_randomized_edge(g):
