@@ -141,7 +141,7 @@ def stats_numberrewirings_conv(path, names, look_aheads, iterations, cut, folder
     #                 print("i",i, "j",j, "keep",len(keep))
     #                 possible_rewire,_ = list_rewirings(g_new,keep[j])
                     keep = read_dic(folder+e[1]+"_"+str(lo)+"_"+str(cut)+"_keep_"+str(i))
-                    possible_rewire = len(rewirings(g_new,keep, e[-1]))
+                    possible_rewire = rewirings(g_new,keep, e[-1])
                     print("possible", possible_rewire)
                     tmp = dict()
                     for (a,b) in possible_rewire:
@@ -150,7 +150,7 @@ def stats_numberrewirings_conv(path, names, look_aheads, iterations, cut, folder
                         else:
                             tmp[a[2]] += 1
                     d_time[lo][i] = tmp
-                    d[lo][i] = possible_rewire
+                    d[lo][i] = len(possible_rewire)
 #                 del keep[0]
                 #save_dic(folder+e[1]+"_"+str(lo)+"_"+str(cut)+"_keep" , keep)
                 #save_dic( folder+e[1]+"_"+str(lo)+"_"+str(cut)+"_exec_time" , d_exec[e[0]])
