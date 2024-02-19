@@ -244,6 +244,7 @@ def weisfeiler_lehman_graph_hash(
     ev = events(G)
     if iterations == -1:
         iterations = len(nod)*len(ev)
+    keep = dict()
 #     keep = { 0:{e:'1'   for e in itertools.product(nodes(G),[i for i in ev])} }
     # set initial node labels
     node_labels, nei = _init_node_labels(G, nod, ev, reverse, look_ahead)
