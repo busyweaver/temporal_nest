@@ -128,6 +128,7 @@ def stats_numberrewirings_conv(path, names, look_aheads, iterations, cut, folder
             for lo in look_aheads:
                 start = time.time()
                 _, col, _, con = weisfeiler_lehman_graph_hash(g_new,iterations = -1, reverse = False, look_ahead = lo, save_each_step = True, name_save = folder+e[1]+"_"+str(lo)+"_"+str(cut)+"_keep")
+                print("end computer color", lo)
     #             print(col,keep)
                 end = time.time()
                 d[lo] = dict()
