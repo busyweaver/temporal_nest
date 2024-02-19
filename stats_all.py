@@ -9,9 +9,7 @@ import os
 import sys
 
 path = "datasets/networks/"
-names = [ ["highschool_2011", "hs11", "purple","u"], ["hospital_ward", "hw", "blue","u"], ["ht09", "ht","red","u"], ["workplace_2013", "wp", "green","u"],
-         ["dblp", "dblp", "brown","d"], ["college", "college", "magenta","d"], ["opsahl", "opsahl", "black","d"],
-         ["email-eu", "eu", "yellow","d"] ]
+names = [ ["college", "college", "magenta","d"], ["dblp", "dblp", "brown","d"], ["opsahl", "opsahl", "black","d"], ["email-eu", "eu", "yellow","d"], ["highschool_2011", "hs11", "purple","u"], ["hospital_ward", "hw", "blue","u"], ["ht09", "ht","red","u"], ["workplace_2013", "wp", "green","u"] ]
 look_aheads = [0.0,0.2,0.4,0.6,0.8,1]
 iterations = 1
 cut = float(sys.argv[1])
@@ -142,7 +140,8 @@ def stats_numberrewirings_conv(path, names, look_aheads, iterations, cut, folder
     #                 print("i",i, "j",j, "keep",len(keep))
     #                 possible_rewire,_ = list_rewirings(g_new,keep[j])
                     keep = read_dic(folder+e[1]+"_"+str(lo)+"_"+str(cut)+"_keep_"+str(i))
-                    possible_rewire = rewirings(g_new,keep, e[-1])
+                    possible_rewire = len(rewirings(g_new,keep, e[-1]))
+                    print("possible", possible_rewire)
                     tmp = dict()
                     for (a,b) in possible_rewire:
                         if a[2] not in tmp:
@@ -150,7 +149,7 @@ def stats_numberrewirings_conv(path, names, look_aheads, iterations, cut, folder
                         else:
                             tmp[a[2]] += 1
                     d_time[lo][i] = tmp
-                    d[lo][i] = len(possible_rewire)
+                    d[lo][i] = possible_rewire
 #                 del keep[0]
                 #save_dic(folder+e[1]+"_"+str(lo)+"_"+str(cut)+"_keep" , keep)
                 #save_dic( folder+e[1]+"_"+str(lo)+"_"+str(cut)+"_exec_time" , d_exec[e[0]])
