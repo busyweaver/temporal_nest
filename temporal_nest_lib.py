@@ -246,9 +246,11 @@ def weisfeiler_lehman_graph_hash(
 #     keep = { 0:{e:'1'   for e in itertools.product(nodes(G),[i for i in ev])} }
     # set initial node labels
     node_labels = _init_node_labels(G, nod, ev, reverse, look_ahead)
+    print("end node label")
     keep = { 1: {e:node_labels[e]   for e in itertools.product(nod,ev)} }
     if save_each_step:
         save_dic(name_save+"_"+str(1) , node_labels)
+    print("end firt save")
     subgraph_hash_counts = []
     i = -1
     for i in range(1,iterations +1):
