@@ -151,6 +151,7 @@ def stats_numberrewirings_conv(path, names, look_aheads, iterations, cut, folder
                             tmp[a[2]] += 1
                     d_time[lo][i] = tmp
                     d[lo][i] = len(possible_rewire)
+                    possible_rewire = []
 #                 del keep[0]
                 #save_dic(folder+e[1]+"_"+str(lo)+"_"+str(cut)+"_keep" , keep)
                 #save_dic( folder+e[1]+"_"+str(lo)+"_"+str(cut)+"_exec_time" , d_exec[e[0]])
