@@ -9,7 +9,7 @@ import os
 import sys
 
 path = "datasets/networks/"
-names = [ ["college", "college", "magenta","d"], ["dblp", "dblp", "brown","d"], ["opsahl", "opsahl", "black","d"], ["email-eu", "eu", "yellow","d"], ["highschool_2011", "hs11", "purple","u"], ["hospital_ward", "hw", "blue","u"], ["ht09", "ht","red","u"], ["workplace_2013", "wp", "green","u"] ]
+names = [ ["email-eu2", "eu2", "magenta","d"], ["dblp", "dblp", "brown","d"], ["opsahl", "opsahl", "black","d"], ["email-eu3", "eu3", "yellow","d"], ["highschool_2011", "hs11", "purple","u"], ["hospital_ward", "hw", "blue","u"], ["ht09", "ht","red","u"], ["workplace_2013", "wp", "green","u"] ]
 look_aheads = [0.0,0.2,0.4,0.6,0.8,1]
 iterations = 1
 cut = float(sys.argv[1])
