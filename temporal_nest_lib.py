@@ -10,6 +10,7 @@ import pickle
 def save_dic(s,d):
     with open(s+".pkl","wb") as f:
         pickle.dump(d,f)
+
 def read_dic(s):
     with open(s+".pkl", 'rb') as f:
         d = pickle.load(f)
@@ -83,13 +84,11 @@ def reverse_neighbour_temp(v,t,g):
 
 
 
-def all_graph_neighbour_imp(g, reverse = False, look_ahead = 1):
+def all_graph_neighbour_imp(g, nod, ev, reverse = False, look_ahead = 1):
     res = dict()
-    ev = events(g)
     l_ev = list(ev)
     m = max(ev)
     look_ahead_num = int( look_ahead * m )
-        
     for (a,b,tpp) in g:
         if reverse:
             l_ev.sort(reverse = True)
@@ -118,7 +117,7 @@ def all_graph_neighbour_imp(g, reverse = False, look_ahead = 1):
                 else:
                     break
 #     print("nodes", nodes(g))
-    for v in nodes(g):
+    for v in nod:
         for t in ev:
             if (v,t) not in res:
                 res[(v,t)] = {}
@@ -144,11 +143,11 @@ def all_graph_neighbour(g, reverse):
 #             res[(v,t)] = neighbour_inst(v,t,g)
 #     return res
 
-def degrees(g,reverse, look_ahead):
+def degrees(g,reverse, look_ahead, nod, ev):
     res = dict()
-    ev = events(g)
+
     nei = all_graph_neighbour_imp(g,reverse, look_ahead)
-    for v in nodes(g):
+    for v in nod:
         for t in ev:
             res[(v,t)] = len(nei[(v,t)])
     return res
@@ -185,8 +184,8 @@ def seq_graphs(g):
 
 def _hash_label(label, digest_size):
     return blake2b(label.encode("ascii"), digest_size=digest_size).hexdigest()
-def _init_node_labels(G, reverse, look_ahead):
-    d = degrees(G, reverse, look_ahead)
+def _init_node_labels(G, nod, ev, reverse, look_ahead):
+    d = degrees(G, nod, ev, reverse, look_ahead)
     return {u: str(d[u]) for u in d.keys()}
 
 def _neighborhood_aggregate(node, node_labels, nei):
@@ -226,35 +225,34 @@ def check_convergence_node_labels(new,old):
 
 def weisfeiler_lehman_graph_hash(
         G, iterations = -1, digest_size=16, keep_iterations=False, reverse = False, look_ahead = 1, save_each_step = False, name_save = ""):
-    def weisfeiler_lehman_step(G, labels, reverse, look_ahead):
+    def weisfeiler_lehman_step(G, labels, nod, ev, reverse, look_ahead):
         """
         Apply neighborhood aggregation to each node
         in the graph.
         Computes a dictionary with labels for each node.
         """
         new_labels = {}
-        nei = all_graph_neighbour_imp(G, reverse, look_ahead)
-        ev = events(G)
-        for node in nodes(G):
+        nei = all_graph_neighbour_imp(G, nod, ev, reverse, look_ahead)
+        for node in nod:
             for t in ev:
                 label = _neighborhood_aggregate((node,t), labels, nei[(node,t)])
                 new_labels[(node,t)] = _hash_label(label, digest_size)
         return new_labels
-    
+    nod = nodes(G)
     ev = events(G)
     if iterations == -1:
-        iterations = len(nodes(G))*len(events(G))
+        iterations = math.inf
 #     keep = { 0:{e:'1'   for e in itertools.product(nodes(G),[i for i in ev])} }
     # set initial node labels
-    node_labels = _init_node_labels(G, reverse, look_ahead)
-    keep = { 1: {e:node_labels[e]   for e in itertools.product(nodes(G),[i for i in ev])} }
+    node_labels = _init_node_labels(G, nod, ev, reverse, look_ahead)
+    keep = { 1: {e:node_labels[e]   for e in itertools.product(nod,[i for i in ev])} }
     if save_each_step:
         save_dic(name_save+"_"+str(1) , node_labels)
     subgraph_hash_counts = []
     i = -1
     for i in range(1,iterations +1):
-#         print(i)
-        node_labels_new = weisfeiler_lehman_step(G, node_labels, reverse, look_ahead)
+        print("iteration", i)
+        node_labels_new = weisfeiler_lehman_step(G, node_labels, nod, ev, reverse, look_ahead)
         counter = Counter(node_labels_new.values())
         # sort the counter, extend total counts
         subgraph_hash_counts.extend(sorted(counter.items(), key=lambda x: x[0]))
@@ -263,7 +261,7 @@ def weisfeiler_lehman_graph_hash(
             break
         else:
             if keep_iterations:
-                keep[i+1] = {e:node_labels[e]   for e in itertools.product(nodes(G),[i for i in ev])}
+                keep[i+1] = node_labels
             if save_each_step:
                 save_dic(name_save+"_"+str(i+1) , node_labels)
             node_labels = node_labels_new
