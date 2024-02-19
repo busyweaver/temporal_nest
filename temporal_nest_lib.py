@@ -151,7 +151,7 @@ def degrees(g, nod, ev, reverse, look_ahead):
     for v in nod:
         for t in ev:
             res[(v,t)] = len(nei[(v,t)])
-    return res
+    return res, nei
 
 def graph_time(g,t):
     res = set()
@@ -186,8 +186,8 @@ def seq_graphs(g):
 def _hash_label(label, digest_size):
     return blake2b(label.encode("ascii"), digest_size=digest_size).hexdigest()
 def _init_node_labels(G, nod, ev, reverse, look_ahead):
-    d = degrees(G, nod, ev, reverse, look_ahead)
-    return {u: str(d[u]) for u in d.keys()}
+    d,nei = degrees(G, nod, ev, reverse, look_ahead)
+    return {u: str(d[u]) for u in d.keys()}, nei
 
 def _neighborhood_aggregate(node, node_labels, nei):
     """
@@ -227,14 +227,14 @@ def check_convergence_node_labels(new,old):
 def weisfeiler_lehman_graph_hash(
         G, iterations = -1, digest_size=16, keep_iterations=False, reverse = False, look_ahead = 1, save_each_step = False, name_save = ""):
     print("salut")
-    def weisfeiler_lehman_step(G, labels, nod, ev, reverse, look_ahead):
+    def weisfeiler_lehman_step(G, nei, labels, nod, ev, reverse, look_ahead):
         """
         Apply neighborhood aggregation to each node
         in the graph.
         Computes a dictionary with labels for each node.
         """
         new_labels = {}
-        nei = all_graph_neighbour_imp(G, nod, ev, reverse, look_ahead)
+        #nei = all_graph_neighbour_imp(G, nod, ev, reverse, look_ahead)
         for node in nod:
             for t in ev:
                 label = _neighborhood_aggregate((node,t), labels, nei[(node,t)])
@@ -243,10 +243,10 @@ def weisfeiler_lehman_graph_hash(
     nod = nodes(G)
     ev = events(G)
     if iterations == -1:
-        iterations = math.inf
+        iterations = len(nod)*len(ev)
 #     keep = { 0:{e:'1'   for e in itertools.product(nodes(G),[i for i in ev])} }
     # set initial node labels
-    node_labels = _init_node_labels(G, nod, ev, reverse, look_ahead)
+    node_labels, nei = _init_node_labels(G, nod, ev, reverse, look_ahead)
     print("end node label")
     keep = { 1: {e:node_labels[e]   for e in itertools.product(nod,ev)} }
     if save_each_step:
@@ -256,7 +256,7 @@ def weisfeiler_lehman_graph_hash(
     i = -1
     for i in range(1,iterations +1):
         print("iteration", i)
-        node_labels_new = weisfeiler_lehman_step(G, node_labels, nod, ev, reverse, look_ahead)
+        node_labels_new = weisfeiler_lehman_step(G, nei, node_labels, nod, ev, reverse, look_ahead)
         counter = Counter(node_labels_new.values())
         # sort the counter, extend total counts
         subgraph_hash_counts.extend(sorted(counter.items(), key=lambda x: x[0]))
