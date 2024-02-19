@@ -225,6 +225,7 @@ def check_convergence_node_labels(new,old):
 
 def weisfeiler_lehman_graph_hash(
         G, iterations = -1, digest_size=16, keep_iterations=False, reverse = False, look_ahead = 1, save_each_step = False, name_save = ""):
+    print("salut")
     def weisfeiler_lehman_step(G, labels, nod, ev, reverse, look_ahead):
         """
         Apply neighborhood aggregation to each node
@@ -245,7 +246,7 @@ def weisfeiler_lehman_graph_hash(
 #     keep = { 0:{e:'1'   for e in itertools.product(nodes(G),[i for i in ev])} }
     # set initial node labels
     node_labels = _init_node_labels(G, nod, ev, reverse, look_ahead)
-    keep = { 1: {e:node_labels[e]   for e in itertools.product(nod,[i for i in ev])} }
+    keep = { 1: {e:node_labels[e]   for e in itertools.product(nod,ev)} }
     if save_each_step:
         save_dic(name_save+"_"+str(1) , node_labels)
     subgraph_hash_counts = []
