@@ -248,7 +248,6 @@ def weisfeiler_lehman_graph_hash(
     # set initial node labels
     node_labels, nei = _init_node_labels(G, nod, ev, reverse, look_ahead)
     print("end node label")
-    keep = { 1: {e:node_labels[e]   for e in itertools.product(nod,ev)} }
     if save_each_step:
         save_dic(name_save+"_"+str(1) , node_labels)
     print("end firt save")
