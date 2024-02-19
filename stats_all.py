@@ -142,7 +142,7 @@ def stats_numberrewirings_conv(path, names, look_aheads, iterations, cut, folder
     #                 possible_rewire,_ = list_rewirings(g_new,keep[j])
                     keep = read_dic(folder+e[1]+"_"+str(lo)+"_"+str(cut)+"_keep_"+str(i))
                     possible_rewire = rewirings(g_new,keep, e[-1])
-                    print("possible", possible_rewire)
+                    print("possible", len(possible_rewire))
                     tmp = dict()
                     for (a,b) in possible_rewire:
                         if a[2] not in tmp:
