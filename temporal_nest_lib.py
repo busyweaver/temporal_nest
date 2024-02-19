@@ -143,10 +143,11 @@ def all_graph_neighbour(g, reverse):
 #             res[(v,t)] = neighbour_inst(v,t,g)
 #     return res
 
-def degrees(g,reverse, look_ahead, nod, ev):
+def degrees(g, nod, ev, reverse, look_ahead):
     res = dict()
-
-    nei = all_graph_neighbour_imp(g,reverse, look_ahead)
+    print("begin all neigbour")
+    nei = all_graph_neighbour_imp(g, nod, ev, reverse, look_ahead)
+    print("end all neigbour")
     for v in nod:
         for t in ev:
             res[(v,t)] = len(nei[(v,t)])
