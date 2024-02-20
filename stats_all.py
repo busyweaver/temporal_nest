@@ -9,7 +9,7 @@ import os
 import sys
 
 path = "datasets/networks/"
-names = [ ["email-eu2", "eu2", "magenta","d"], ["dblp", "dblp", "brown","d"], ["opsahl", "opsahl", "black","d"], ["email-eu3", "eu3", "yellow","d"], ["highschool_2011", "hs11", "purple","u"], ["hospital_ward", "hw", "blue","u"], ["ht09", "ht","red","u"], ["workplace_2013", "wp", "green","u"] ]
+names = [ ["opsahl", "opsahl", "black","d"], ["email-eu2", "eu2", "magenta","d"], ["dblp", "dblp", "brown","d"], ["email-eu3", "eu3", "yellow","d"], ["highschool_2011", "hs11", "purple","u"], ["hospital_ward", "hw", "blue","u"], ["ht09", "ht","red","u"], ["workplace_2013", "wp", "green","u"] ]
 look_aheads = [0.0,0.2,0.4,0.6,0.8,1]
 iterations = 1
 cut = float(sys.argv[1])
@@ -76,7 +76,7 @@ for k in range(len(names)):
     #     axs[j,i].set_xticks([0,20,40,60,80,100], labels=[0,0.2,0.4,0.6,0.8,1])
     #     axs[j,i].set_yticks([0,0.2,0.4,0.6,0.8,1],labels=[0,0.2,0.4,0.6,0.8,1])
 fig.set_size_inches(15, 10)
-fig.savefig(folder_res+"edge_dist.eps", dpi=150)
+fig.savefig(folder_res+"edge_dist.svg", format="svg", transparent = True, dpi=150)
 fig.show()
 
 import re
@@ -233,7 +233,7 @@ for k in range(len(names)):
     #     axs[j,i].set_xticks([0,20,40,60,80,100], labels=[0,0.2,0.4,0.6,0.8,1])
     #     axs[j,i].set_yticks([0,0.2,0.4,0.6,0.8,1],labels=[0,0.2,0.4,0.6,0.8,1])
 fig.set_size_inches(15, 10)
-fig.savefig(folder_res+"conv_steps.eps", dpi=150)
+fig.savefig(folder_res+"conv_steps.svg", format="svg", transparent = True, dpi=150)
 fig.show()
 
 
@@ -282,7 +282,7 @@ for k in range(len(names)):
 #     axs[j,i].set_xticks([0,20,40,60,80,100], labels=[0,0.2,0.4,0.6,0.8,1])
 #     axs[j,i].set_yticks([0,0.2,0.4,0.6,0.8,1],labels=[0,0.2,0.4,0.6,0.8,1])
 fig.set_size_inches(20, 12)
-fig.savefig(folder_res+"number_rewire.eps", dpi=150)
+fig.savefig(folder_res+"number_rewire.svg", format="svg", transparent = True, dpi=150)
 fig.show()
 
 
@@ -340,7 +340,7 @@ for k in range(len(names)):
     axs[j,i].xaxis.set_label_coords(0.5,-0.07)
 
 fig.set_size_inches(20, 12)
-fig.savefig(folder_res+"dist_rewire.eps", dpi=150)
+fig.savefig(folder_res+"dist_rewire.svg", format="svg", transparent = True, dpi=150)
 fig.show()
 
 
@@ -392,7 +392,7 @@ for k in range(len(names)):
     axs[j,i].xaxis.set_label_coords(0.5,-0.07)
 
 fig.set_size_inches(20, 12)
-fig.savefig(folder_res+"expected_rewire.eps", dpi=150)
+fig.savefig(folder_res+"expected_rewire.svg", format="svg", transparent = True, dpi=150)
 fig.show()
 
 
@@ -456,11 +456,6 @@ def statistics_rewirings_diff(path,names,cut,nb_rewire,iter_pandemy,folder, fold
             names_keep = folder+names[k][1]+"_"+str(1)+"_"+str(cut)+"_keep"
             max_wl = max_it = find_max_wl(folder, names_keep)
             col = read_dic(names_keep+"_"+str(max_wl))
-            if wl_it == -1:
-                col = keep[ max(keep.keys()) ]
-            else:
-                col = keep[w_it]
-
     #         _, col, _, _ = weisfeiler_lehman_graph_hash(g_new, iterations = wl_it,  look_ahead = look_ahead)
             nb = len(rewirings(g_new,col, names[k][-1]))
             rates = [0.1,0.2,0.3]
@@ -471,6 +466,7 @@ def statistics_rewirings_diff(path,names,cut,nb_rewire,iter_pandemy,folder, fold
                 average = dict( { e:dict(  {ee : 0 for ee in range(len(l)) } )  for e in rates }  )
                 pan = 0
                 while pan <= iter_pandemy:
+                    print("pan", pan)
                     for rate in rates:
                         for i in range(len(l)):
                             b = False
@@ -505,7 +501,7 @@ def statistics_rewirings_diff(path,names,cut,nb_rewire,iter_pandemy,folder, fold
 
 nb_rewire = 100
 nb_pandemy = 10
-statistics_rewirings(path,names,cut,nb_rewire ,folder, folder_res)
+#statistics_rewirings(path,names,cut,nb_rewire ,folder, folder_res)
 
 
 # In[ ]:

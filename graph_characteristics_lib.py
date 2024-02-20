@@ -99,23 +99,32 @@ import numpy as np
 def SI(g, rate,  thresh  = 0.03, horizon = "sr", rate_rec = 0, iterations = math.inf):
     #selcting random v,t
     ev = events(g)
-    m = max(ev)
+    l_ev = list(ev)
+    m = l_ev[-1]
+    t = l_ev[0]
     V = nodes(g)
+    lV = list(V)
     num_thresh = int(thresh * (len(V)*len(ev)) )
     if horizon == "sr":
         lk = rate
     else:
         lk = horizon
-        
-    nei = all_graph_neighbour_imp(g, look_ahead = lk)
-    source = random.choice(list(V))
-    t = min(ev)
-    while len(nei[(source,t)]) < 2:
-        source = random.choice(list(V))
-        t = min(ev)
+    look_ahead_num = int( lk * m )
+    nei = all_graph_neighbour_node(g, V, l_ev, look_ahead = lk)    
+    #nei = all_graph_neighbour_imp(g, look_ahead = lk)
+    possible_start = []
+    for v in lV:
+        if len(neighb(nei[v],t, look_ahead_num)) >= 1:
+            possible_start.append(v)
+
+    if len(possible_start) == 0:
+        print("no possible pandemy")
+        return 0,0,0
+
+    source = random.choice(possible_start)
         
 #     print(source)
-    healthy = set( [ element for element in itertools.product(list(V), list(ev))])
+    healthy = set( [ element for element in itertools.product(lV, l_ev)])
     healthy.remove((source,t))
     infected = {(source,t)}
 #     tot = len(V)*len(ev)
@@ -126,16 +135,16 @@ def SI(g, rate,  thresh  = 0.03, horizon = "sr", rate_rec = 0, iterations = math
 #         print("len inf", len(infected), "thresh", thresh)
         current_infected = set(list(infected)[:])
 #         print("current_infected", current_infected)
-        capacity = diffuse_pandemic(g, nei, healthy, current_infected, infected, {}, rate, rate_rec)
+        capacity = diffuse_pandemic(g, nei, healthy, current_infected, infected, {}, rate, rate_rec, look_ahead_num)
         itera += 1
-    return itera, len(infected)/(len(V)*len(ev)), capacity
+    return itera, len(infected)/(len(lV)*len(l_ev)), capacity
 
-def diffuse_pandemic(g, nei, healthy, current_infected, infected, recovered, rate_inf, rate_rec):
+def diffuse_pandemic(g, nei, healthy, current_infected, infected, recovered, rate_inf, rate_rec, lkn):
 #     print("current_infected", current_infected)
     capacity = 0
     for v in current_infected:
 #         print("nei[v]", nei[v])
-        for w in nei[v]:
+        for w in neighb(nei[v[0]],v[1], lkn): 
             if w in healthy:
                 capacity += 1
                 val = bernoulli.rvs(size=1,p=rate_inf)[0]
