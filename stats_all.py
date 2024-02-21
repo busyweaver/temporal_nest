@@ -14,6 +14,10 @@ look_aheads = [0.0,0.2,0.4,0.6,0.8,1]
 iterations = 1
 cut = float(sys.argv[1])
 print("cut", cut)
+if len(sys.argv) < 2:
+    approx = 1
+else:
+    approx = float(sys.argv[1])
 
 def find_sep(x):
     for s in x:
@@ -401,7 +405,7 @@ fig.show()
 # In[2]:
 
 
-def statistics_rewirings(path,names,cut,nb_rewire, folder, folder_res,wl_it = -1,look_ahead = 1):
+def statistics_rewirings(path,names,cut,nb_rewire, folder, folder_res, approx, wl_it = -1,look_ahead = 1):
     print("stats rewirings")
     files = [f for f in os.listdir(folder_res) if os.path.isfile(folder_res+f)]
     s = "table_charac.tex"
@@ -430,13 +434,13 @@ def statistics_rewirings(path,names,cut,nb_rewire, folder, folder_res,wl_it = -1
                 x,y,z = randomize(g_new,nb_rewire,col,names[k][-1])
                 fg.write(names[k][1])
                 for e in [g_new,x,y,z]:
-                    fg.write(" & $ "+str(float(average_clustering_network(e)))[:5]+" $,")
+                    fg.write(" & $ "+str(float(average_clustering_network(e,approx)))[:5]+" $,")
                     print("clust ok")
                 for e in [g_new,x,y,z]:
-                    fg.write(" & $ "+str(float(global_efficiency(e,"s")[0]))[:5]+" $ ,")
+                    fg.write(" & $ "+str(float(global_efficiency(e,"s",approx)[0]))[:5]+" $ ,")
                     print("effi shor ok")
                 for e in [g_new,x,y,z]:
-                    fg.write(" & $ "+str(float(global_efficiency(e,"d")[0]))[:5]+" $ ,")
+                    fg.write(" & $ "+str(float(global_efficiency(e,"d",approx)[0]))[:5]+" $ ,")
                     print("effi dur ok")
                 fg.write("\\\\ \n")
         fg.close()
@@ -447,7 +451,7 @@ def statistics_rewirings(path,names,cut,nb_rewire, folder, folder_res,wl_it = -1
 # In[3]:
 
 
-def statistics_rewirings_diff(path,names,cut,nb_rewire,iter_pandemy,folder, folder_res, wl_it = -1,look_ahead = 1):
+def statistics_rewirings_diff(path,names,cut,nb_rewire,iter_pandemy,folder, folder_res, approx, wl_it = -1,look_ahead = 1):
     print("stats diffusion")
     files = [f for f in os.listdir(folder_res) if os.path.isfile(folder_res+f)]
     s = "table_diff_"+str(iter_pandemy)+".tex"
@@ -507,13 +511,13 @@ def statistics_rewirings_diff(path,names,cut,nb_rewire,iter_pandemy,folder, fold
 
 nb_rewire = 100
 nb_pandemy = 10
-statistics_rewirings(path,names,cut,nb_rewire ,folder, folder_res)
+statistics_rewirings(path,names,cut,nb_rewire ,folder, folder_res, approx)
 
 
 # In[ ]:
 
 
-statistics_rewirings_diff(path,names,cut,nb_rewire, nb_pandemy,folder, folder_res)
+statistics_rewirings_diff(path,names,cut,nb_rewire, nb_pandemy,folder, folder_res, approx)
 
 
 # In[ ]:

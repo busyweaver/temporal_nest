@@ -6,7 +6,7 @@ import operator
 import networkx as nx
 import straph.paths.meta_walks as mw
 import straph.betweenness.optimal_paths as opt
-
+import random
 import numpy
 
 #max of a set with positive values
@@ -17,10 +17,10 @@ def max_not_inf(s):
             m = e
     return m
 
-def global_efficiency(g,p,eps = 10^(-6)):
+def global_efficiency(g,p,approx):
     diameter = -1
     su = 0
-    to_straph_file(g,"tmp")    
+    to_straph_file(g,"tmp")
     b = operator.lt
     walk_type = "passive"
     if p == "d":
@@ -32,29 +32,26 @@ def global_efficiency(g,p,eps = 10^(-6)):
     event, event_reverse = bt.events_dic(S)
     link_ind = bt.link_index(S)
     neighbors, neighbors_inv = bt.neighbors_direct(S)
-    for v in S.nodes:
+    sam = random.sample(S.nodes, k = int(approx*len(V)))
+    for v in sam:
         _, cur_best, _ = bt.dijkstra_directed_dis_gen(S, v, event, event_reverse, neighbors, neighbors_inv, link_ind, b, fun, walk_type)
 #         _, cur_besttmp, _ = bt.dijkstra_directed_dis_gen(S, v, event, event_reverse, neighbors, neighbors_inv, link_ind, b, fun2, walk_type)
         for w in S.nodes:
             if v!=w:
                 dvw = min(cur_best[w].values())
-                
                 if dvw != 0:
                     if p == "d":
                         su += (1/(dvw+1))
                     else:
                         su += (1/dvw)
-                
                 if dvw != numpy.Infinity:
                     if dvw > diameter:
                         diameter = dvw
-    N = len(S.nodes)
+    N = len(sam)
     #if want to renormalize
     return  (1/(N*(N-1)))*su, diameter
-    
     #return su, diameter
 
-    
 
 def topological_overlap(g,i,t,ev,se,V):
     m = ev.index(t)
@@ -80,12 +77,14 @@ def average_topological_overlap(g,i,ev,se,V):
         if t != m:
             su += topological_overlap(g,i,t,ev,se,V)
     return (1/(m-1))*su
-def average_clustering_network(g):
-    V = nodes(g)
+def average_clustering_network(g, approx):
+    V = list(nodes(g))
     ev = list(events(g))
     ev.sort()
     se = seq_graphs(g)
-    return (1/len(V))*sum(  average_topological_overlap(g,i,ev,se,V) for i in V  )
+    sam = random.sample(V, k = int(approx*len(V)))
+
+    return (1/len(sam))*sum(  average_topological_overlap(g,i,ev,se,V) for i in sam )
 
 import itertools
 import random
