@@ -917,13 +917,10 @@ def randomize(g,n,col,dire):
         g1 = rewire_any(g,n,col,dire)
     else:
         g1 = felix_flips(g,n,col)
-#     print("fin g1")
-#     print("graph eq g1", graphs_equality(g_tmp,g))
+    print("fin g1")
     g2 = randomized_edge_same_time(g,dire, n)
-#     print("fin g2")
-#     print("graph eq g2", graphs_equality(g_tmp,g))
+    print("fin g2")
     g3 = randomized_edge(g,dire,n)
-#     print("graph eq g3", graphs_equality(g_tmp,g))
-#     print("fin g3")
+    print("fin g3")
     return g1, g2, g3
 

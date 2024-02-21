@@ -423,7 +423,8 @@ def statistics_rewirings(path,names,cut,nb_rewire, folder, folder_res,wl_it = -1
             #     col = keep[w_it]
 
     #         _, col, _, _ = weisfeiler_lehman_graph_hash(g_new, iterations = wl_it,  look_ahead = look_ahead)
-            nb = len(rewirings(g_new,col, names[k][-1]))
+            #nb = len(rewirings(g_new,col, names[k][-1]))
+            nb = 1
     #         print(nb)
             if nb != 0:
                 x,y,z = randomize(g_new,nb_rewire,col,names[k][-1])
@@ -506,7 +507,7 @@ def statistics_rewirings_diff(path,names,cut,nb_rewire,iter_pandemy,folder, fold
 
 nb_rewire = 100
 nb_pandemy = 10
-#statistics_rewirings(path,names,cut,nb_rewire ,folder, folder_res)
+statistics_rewirings(path,names,cut,nb_rewire ,folder, folder_res)
 
 
 # In[ ]:
