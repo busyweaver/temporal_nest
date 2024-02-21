@@ -210,18 +210,20 @@ fig, axs = plt.subplots(2,4)
 for k in range(len(names)):
 #     print(names[k][0])
     dd = dict()
+    l = []
     for e in look_aheads:
         name_keep = folder+names[k][1]+"_"+str(e)+"_"+str(cut)+"_keep"
         max_wl = find_max_wl(folder, name_keep)
-        f = read_dic(name_keep+"_"+str(max_wl))
-        f2 = read_dic(name_keep+"_"+str(1))
-#         print("look for", f)
-        dd[e] = {1: f, max_wl : f2 }
-#         print(dd[e])
-#         print(max(dd[e].keys()))
+        l.append(max_wl)
+#         f = read_dic(name_keep+"_"+str(max_wl))
+#         f2 = read_dic(name_keep+"_"+str(1))
+# #         print("look for", f)
+#         dd[e] = {1: f, max_wl : f2 }
+# #         print(dd[e])
+# #         print(max(dd[e].keys()))
     i = k//2
     j = k%2
-    l = [  max(dd[e].keys()) for e in look_aheads ]
+    #l = [  max(dd[e].keys()) for e in look_aheads ]
 #     for it in range(iterations):
     #     print(l)
     axs[j, i].set_title(names[k][1])
@@ -411,8 +413,10 @@ def statistics_rewirings(path,names,cut,nb_rewire, folder, folder_res,wl_it = -1
             g_new = graph_cut(g,names[k][-1], cut)
             m = max(events(g_new))
             names_keep = folder+names[k][1]+"_"+str(1)+"_"+str(cut)+"_keep"
-            max_wl = max_it = find_max_wl(folder, names_keep)
-            col = read_dic(names_keep+"_"+str(max_wl))
+            max_wl = find_max_wl(folder, names_keep)
+            # if want max iteration do this
+            # col = read_dic(names_keep+"_"+str(max_wl))
+            col = read_dic(names_keep+"_"+str(1))
             # if wl_it == -1:
             #     col = keep[ max(keep.keys()) ]
             # else:
@@ -455,7 +459,7 @@ def statistics_rewirings_diff(path,names,cut,nb_rewire,iter_pandemy,folder, fold
             m = max(events(g_new))
             names_keep = folder+names[k][1]+"_"+str(1)+"_"+str(cut)+"_keep"
             max_wl = max_it = find_max_wl(folder, names_keep)
-            col = read_dic(names_keep+"_"+str(max_wl))
+            col = read_dic(names_keep+"_"+str(1))
     #         _, col, _, _ = weisfeiler_lehman_graph_hash(g_new, iterations = wl_it,  look_ahead = look_ahead)
             nb = len(rewirings(g_new,col, names[k][-1]))
             rates = [0.1,0.2,0.3]
