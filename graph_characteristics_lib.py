@@ -32,7 +32,7 @@ def global_efficiency(g,p,approx):
     event, event_reverse = bt.events_dic(S)
     link_ind = bt.link_index(S)
     neighbors, neighbors_inv = bt.neighbors_direct(S)
-    sam = random.sample(S.nodes, k = int(approx*len(V)))
+    sam = random.sample(S.nodes, k = int(approx*len(S.nodes)))
     for v in sam:
         _, cur_best, _ = bt.dijkstra_directed_dis_gen(S, v, event, event_reverse, neighbors, neighbors_inv, link_ind, b, fun, walk_type)
 #         _, cur_besttmp, _ = bt.dijkstra_directed_dis_gen(S, v, event, event_reverse, neighbors, neighbors_inv, link_ind, b, fun2, walk_type)
