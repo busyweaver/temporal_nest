@@ -367,7 +367,7 @@ def felix_flips(gg,n,col):
         flips[t] = possible_flips_at(node_set, col,se,t)
 #         flips.remove(x)
 #         flips.add((x[1],x[0]))
-    return list(g)   
+    return list(g)
 
                 
 
@@ -540,7 +540,6 @@ def rewire_any(gg,n,col,dire):
         index.append(t)
         rewire[t] = list(rewirings_at_time(se,col,t))
         l = l+rewire[t]
-        
     for i in range(n):
 #         print("i",i)
         g,se,t,tp = rewiring_one(g,rewire,se,dire)
@@ -856,9 +855,7 @@ def random_times(g):
         for e in d[t]:
             res.add((e[0],e[1],t))
     return res
-        
     #generate gnm according to edges
-    
 def aggregated_graph(g):
     d = {}
     for e in g:

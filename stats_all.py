@@ -14,10 +14,10 @@ look_aheads = [0.0,0.2,0.4,0.6,0.8,1]
 iterations = 1
 cut = float(sys.argv[1])
 print("cut", cut)
-if len(sys.argv) < 2:
+if len(sys.argv) <= 2:
     approx = 1
 else:
-    approx = float(sys.argv[1])
+    approx = float(sys.argv[2])
 
 def find_sep(x):
     for s in x:
@@ -405,12 +405,14 @@ fig.show()
 # In[2]:
 
 
-def statistics_rewirings(path,names,cut,nb_rewire, folder, folder_res, approx, wl_it = -1,look_ahead = 1):
+def statistics_rewirings(path,names,cut,nb_rewire, iter_pandemy, folder, folder_res, approx, wl_it = -1,look_ahead = 1):
     print("stats rewirings")
     files = [f for f in os.listdir(folder_res) if os.path.isfile(folder_res+f)]
     s = "table_charac.tex"
+    s2 = s = "table_diff_"+str(iter_pandemy)+".tex"
     if s not in files:
         fg = open(folder_res+s, "w")
+        fg2 = open(folder_res+s2, "w")
         for k in range(0,len(names)):
             print("statistics_rewirings",  names[k][0])
             g = read_graph(path,names[k][0], names[k][-1])
@@ -421,15 +423,7 @@ def statistics_rewirings(path,names,cut,nb_rewire, folder, folder_res, approx, w
             # if want max iteration do this
             # col = read_dic(names_keep+"_"+str(max_wl))
             col = read_dic(names_keep+"_"+str(1))
-            # if wl_it == -1:
-            #     col = keep[ max(keep.keys()) ]
-            # else:
-            #     col = keep[w_it]
-
-    #         _, col, _, _ = weisfeiler_lehman_graph_hash(g_new, iterations = wl_it,  look_ahead = look_ahead)
-            #nb = len(rewirings(g_new,col, names[k][-1]))
             nb = 1
-    #         print(nb)
             if nb != 0:
                 x,y,z = randomize(g_new,nb_rewire,col,names[k][-1])
                 fg.write(names[k][1])
@@ -443,7 +437,40 @@ def statistics_rewirings(path,names,cut,nb_rewire, folder, folder_res, approx, w
                     fg.write(" & $ "+str(float(global_efficiency(e,"d",approx)[0]))[:5]+" $ ,")
                     print("effi dur ok")
                 fg.write("\\\\ \n")
+
+                # DIFFUSIONS
+                l = [g_new,x,y,z]
+                average = dict( { e:dict(  {ee : 0 for ee in range(len(l)) } )  for e in rates }  )
+                pan = 0
+                while pan <= iter_pandemy:
+                    print("pan", pan)
+                    for rate in rates:
+                        for i in range(len(l)):
+                            b = False
+                            tries = 0
+    #                         print("pan", pan, "rate", rate, "i",i)
+                            while not b and tries < 100:
+#                                 print("tries", tries)
+                                r = SI(l[i], rate, thresh = rate*(1/1000))
+                                if r[2] != 0:
+                                    b = True
+                                tries += 1
+                            if tries == 100:
+                                print("too many unsuceeded tries for outbreak")
+    #                         print("r",r)
+    #                         print(average)
+                            average[rate][i] += (r[0]/iter_pandemy)
+                    pan += 1
+                fg2.write(names[k][1]+" ")
+                for rate in rates:
+                    for i in range(len(l)):
+                        fg2.write("$ "+str(float(average[rate][i]))[:5]+" $ ")
+                fg2.write("\\\\ \n")
+            
+
+
         fg.close()
+        fg2.close()
     else:
         print("file statistics_rewirings already present")
 
@@ -511,13 +538,13 @@ def statistics_rewirings_diff(path,names,cut,nb_rewire,iter_pandemy,folder, fold
 
 nb_rewire = 100
 nb_pandemy = 10
-statistics_rewirings(path,names,cut,nb_rewire ,folder, folder_res, approx)
+statistics_rewirings(path,names,cut,nb_rewire, nb_pandemy, folder, folder_res, approx)
 
 
 # In[ ]:
 
 
-statistics_rewirings_diff(path,names,cut,nb_rewire, nb_pandemy,folder, folder_res, approx)
+#statistics_rewirings_diff(path,names,cut,nb_rewire, nb_pandemy,folder, folder_res, approx)
 
 
 # In[ ]:
