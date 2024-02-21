@@ -56,12 +56,8 @@ def global_efficiency(g,p,eps = 10^(-6)):
 
     
 
-def topological_overlap(g,i,t):
-    se = seq_graphs(g)
-    ev = list(events(g))
-    ev.sort()
+def topological_overlap(g,i,t,ev,se,V):
     m = ev.index(t)
-    V = nodes(g)
     gm = adj(se[t])
     gmp = adj(se[ev[m+1]])
     su = [0,0,0]
@@ -76,18 +72,20 @@ def topological_overlap(g,i,t):
         return 0
     else:
         return su[0]/(math.sqrt( su[1]*su[2]))
-        
-def average_topological_overlap(g,i):
-    ev = events(g)
-    m = max(ev)
+def average_topological_overlap(g,i,ev,se,V):
+    #max value
+    m = ev[-1]
     su = 0
     for t in ev:
         if t != m:
-            su += topological_overlap(g,i,t)
+            su += topological_overlap(g,i,t,ev,se,V)
     return (1/(m-1))*su
 def average_clustering_network(g):
     V = nodes(g)
-    return (1/len(V))*sum(  average_topological_overlap(g,i) for i in V  )
+    ev = list(events(g))
+    ev.sort()
+    se = seq_graphs(g)
+    return (1/len(V))*sum(  average_topological_overlap(g,i,ev,se,V) for i in V  )
 
 import itertools
 import random
