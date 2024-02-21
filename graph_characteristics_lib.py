@@ -29,10 +29,11 @@ def global_efficiency(g,p,approx):
         fun =  opt.co_sh_im
     S = sg.read_stream_graph(path_nodes="tmp_nodes.sg",
                           path_links="tmp_links.sg")
+    lS = list(S.nodes)
     event, event_reverse = bt.events_dic(S)
     link_ind = bt.link_index(S)
     neighbors, neighbors_inv = bt.neighbors_direct(S)
-    sam = random.sample(S.nodes, k = int(approx*len(S.nodes)))
+    sam = random.sample(lS, k = int(approx*len(lS)))
     for v in sam:
         _, cur_best, _ = bt.dijkstra_directed_dis_gen(S, v, event, event_reverse, neighbors, neighbors_inv, link_ind, b, fun, walk_type)
 #         _, cur_besttmp, _ = bt.dijkstra_directed_dis_gen(S, v, event, event_reverse, neighbors, neighbors_inv, link_ind, b, fun2, walk_type)
