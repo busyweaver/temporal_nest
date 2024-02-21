@@ -458,10 +458,11 @@ def statistics_rewirings_diff(path,names,cut,nb_rewire,iter_pandemy,folder, fold
             g_new = graph_cut(g,names[k][-1],cut)
             m = max(events(g_new))
             names_keep = folder+names[k][1]+"_"+str(1)+"_"+str(cut)+"_keep"
-            max_wl = max_it = find_max_wl(folder, names_keep)
+            max_wl = find_max_wl(folder, names_keep)
             col = read_dic(names_keep+"_"+str(1))
     #         _, col, _, _ = weisfeiler_lehman_graph_hash(g_new, iterations = wl_it,  look_ahead = look_ahead)
-            nb = len(rewirings(g_new,col, names[k][-1]))
+            #nb = len(rewirings(g_new,col, names[k][-1]))
+            nb = 1
             rates = [0.1,0.2,0.3]
     #         print(nb)
             if nb != 0:
@@ -476,13 +477,13 @@ def statistics_rewirings_diff(path,names,cut,nb_rewire,iter_pandemy,folder, fold
                             b = False
                             tries = 0
     #                         print("pan", pan, "rate", rate, "i",i)
-                            while not b and tries < 500:
+                            while not b and tries < 100:
 #                                 print("tries", tries)
                                 r = SI(l[i], rate, thresh = rate*(1/1000))
                                 if r[2] != 0:
                                     b = True
                                 tries += 1
-                            if tries == 1000:
+                            if tries == 100:
                                 print("too many unsuceeded tries for outbreak")
     #                         print("r",r)
     #                         print(average)
