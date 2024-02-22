@@ -440,6 +440,7 @@ def statistics_rewirings(path,names,cut,nb_rewire, iter_pandemy, folder, folder_
 
                 # DIFFUSIONS
                 l = [g_new,x,y,z]
+                rates = [0.1,0.2,0.3]
                 average = dict( { e:dict(  {ee : 0 for ee in range(len(l)) } )  for e in rates }  )
                 pan = 0
                 while pan <= iter_pandemy:
