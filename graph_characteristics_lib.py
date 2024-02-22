@@ -49,8 +49,12 @@ def global_efficiency(g,p,approx):
                     if dvw > diameter:
                         diameter = dvw
     N = len(sam)
+    #print("N", N)
     #if want to renormalize
-    return  (1/(N*(N-1)))*su, diameter
+    if N > 1:
+        return  (1/(N*(N-1)))*su, diameter
+    else:
+        return  su, diameter
     #return su, diameter
 
 
@@ -84,7 +88,8 @@ def average_clustering_network(g, approx):
     ev.sort()
     se = seq_graphs(g)
     sam = random.sample(V, k = int(approx*len(V)))
-
+    if len(sam) == 0:
+        return 0
     return (1/len(sam))*sum(  average_topological_overlap(g,i,ev,se,V) for i in sam )
 
 import itertools

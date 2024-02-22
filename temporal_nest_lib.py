@@ -486,6 +486,7 @@ def rewiring_one(g_new, rewire, se, dire):
 #     print("is possible?", possible_rewire)
 #     m = max(events(g))
     r = -1
+    tp = -1
     if su != 0:
         i = random.randint(0,su-1)
         lk = list(rewire.keys())

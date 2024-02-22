@@ -443,7 +443,7 @@ def statistics_rewirings(path,names,cut,nb_rewire, iter_pandemy, folder, folder_
                 rates = [0.1,0.2,0.3]
                 average = dict( { e:dict(  {ee : 0 for ee in range(len(l)) } )  for e in rates }  )
                 pan = 0
-                while pan <= iter_pandemy:
+                while pan < iter_pandemy:
                     print("pan", pan)
                     for rate in rates:
                         for i in range(len(l)):
