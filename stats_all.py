@@ -409,7 +409,7 @@ def statistics_rewirings(path,names,cut,nb_rewire, iter_pandemy, folder, folder_
     print("stats rewirings")
     files = [f for f in os.listdir(folder_res) if os.path.isfile(folder_res+f)]
     s = "table_charac.tex"
-    s2 = s = "table_diff_"+str(iter_pandemy)+".tex"
+    s2 = "table_diff_"+str(iter_pandemy)+".tex"
     if s not in files:
         fg = open(folder_res+s, "w")
         fg2 = open(folder_res+s2, "w")
@@ -447,28 +447,14 @@ def statistics_rewirings(path,names,cut,nb_rewire, iter_pandemy, folder, folder_
                     print("pan", pan)
                     for rate in rates:
                         for i in range(len(l)):
-                            b = False
-                            tries = 0
-    #                         print("pan", pan, "rate", rate, "i",i)
-                            while not b and tries < 100:
-#                                 print("tries", tries)
-                                r = SI(l[i], rate, thresh = rate*(1/1000))
-                                if r[2] != 0:
-                                    b = True
-                                tries += 1
-                            if tries == 100:
-                                print("too many unsuceeded tries for outbreak")
-    #                         print("r",r)
-    #                         print(average)
-                            average[rate][i] += (r[0]/iter_pandemy)
+                            r = SI(l[i], rate, iterations = 100)
+                            average[rate][i] += (r[1]/iter_pandemy)
                     pan += 1
                 fg2.write(names[k][1]+" ")
                 for rate in rates:
                     for i in range(len(l)):
                         fg2.write("$ "+str(float(average[rate][i]))[:5]+" $ ")
                 fg2.write("\\\\ \n")
-            
-
 
         fg.close()
         fg2.close()
