@@ -506,7 +506,7 @@ def statistics_rewirings_diff(path,names,cut,nb_rewire,iter_pandemy,folder, fold
                                 print("too many unsuceeded tries for outbreak")
     #                         print("r",r)
     #                         print(average)
-                            average[rate][i] += (r[0]/iter_pandemy)
+                            average[rate][i] += (r[1]/iter_pandemy)
                     pan += 1
 
 
