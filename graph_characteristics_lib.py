@@ -113,7 +113,7 @@ def SI(g, rate,  thresh  = 0.03, horizon = "sr", rate_rec = 0, iterations = math
     else:
         lk = horizon
     look_ahead_num = int( lk * m )
-    nei = all_graph_neighbour_node(g, V, l_ev, look_ahead = lk)    
+    nei = all_graph_neighbour_node(g, V, l_ev, look_ahead = lk)
     #nei = all_graph_neighbour_imp(g, look_ahead = lk)
     possible_start = []
     for v in lV:
@@ -125,7 +125,6 @@ def SI(g, rate,  thresh  = 0.03, horizon = "sr", rate_rec = 0, iterations = math
         return 0,0,0
 
     source = random.choice(possible_start)
-        
 #     print(source)
     healthy = set( [ element for element in itertools.product(lV, l_ev)])
     healthy.remove((source,t))
