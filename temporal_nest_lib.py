@@ -901,12 +901,19 @@ def to_straph_file(g,s):
 def adj(g):
     tmp = dict()
     for u,v in g:
-        for x,y in [(u,v),(v,u)]:
-            if x in tmp:
-                tmp[x].add(y)
-            else:
-                tmp[x] = {y}
+        if u in tmp:
+            tmp[u].add(v)
+        else:
+            tmp[u] = {v}
     return tmp
+
+def node_static(g):
+    res = {}
+    for (u,v) in g:
+        res.add(u)
+        res.add(v)
+    return res
+
 
 def randomize(g,n,col,dire):
 #     print("start ****")

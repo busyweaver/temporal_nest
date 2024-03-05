@@ -58,39 +58,93 @@ def global_efficiency(g,p,approx):
     #return su, diameter
 
 
-def topological_overlap(g,i,t,ev,se,V):
-    m = ev.index(t)
-    gm = adj(se[t])
-    gmp = adj(se[ev[m+1]])
-    su = [0,0,0]
-    for j in V:
-        if (i in gm and j in gm[i]):
-            su[1] += 1
-        if (i in gmp and j in gmp[i]):
-            su[2] += 1
-        if (i in gm and j in gm[i]) and (i in gmp and j in gmp[i]):
-            su[0] += 1
-    if su[1] ==0 or su[2]==0:
-        return 0
-    else:
-        return su[0]/(math.sqrt( su[1]*su[2]))
-def average_topological_overlap(g,i,ev,se,V):
-    #max value
-    m = ev[-1]
-    su = 0
-    for t in ev:
-        if t != m:
-            su += topological_overlap(g,i,t,ev,se,V)
-    return (1/(m-1))*su
-def average_clustering_network(g, approx):
+# def topological_overlap(g,i,t,ev,se,V):
+#     m = ev.index(t)
+#     gm = adj(se[t])
+#     gmp = adj(se[ev[m+1]])
+#     su = [0,0,0]
+#     for j in V:
+#         if (i in gm and j in gm[i]):
+#             su[1] += 1
+#         if (i in gmp and j in gmp[i]):
+#             su[2] += 1
+#         if (i in gm and j in gm[i]) and (i in gmp and j in gmp[i]):
+#             su[0] += 1
+#     if su[1] ==0 or su[2]==0:
+#         return 0
+#     else:
+#         return su[0]/(math.sqrt( su[1]*su[2]))
+# def average_topological_overlap(g,i,ev,se,V):
+#     #max value
+#     m = ev[-1]
+#     su = 0
+#     for t in ev:
+#         if t != m:
+#             su += topological_overlap(g,i,t,ev,se,V)
+#     return (1/(m-1))*su
+# def average_clustering_network(g, approx):
+#     V = list(nodes(g))
+#     ev = list(events(g))
+#     ev.sort()
+#     se = seq_graphs(g)
+#     sam = random.sample(V, k = int(approx*len(V)))
+#     if len(sam) == 0:
+#         return 0
+#     return (1/len(sam))*sum(  average_topological_overlap(g,i,ev,se,V) for i in sam )
+
+def average_clustering_network2(g):
     V = list(nodes(g))
     ev = list(events(g))
     ev.sort()
+    ma = ev[-1]
     se = seq_graphs(g)
-    sam = random.sample(V, k = int(approx*len(V)))
-    if len(sam) == 0:
-        return 0
-    return (1/len(sam))*sum(  average_topological_overlap(g,i,ev,se,V) for i in sam )
+    su = 0
+    for t in range(len(ev)):
+        if t != ma:
+            nb = { ii : 0 for ii in V }
+            adj1 = adj(se[ev[t]])
+            adj2 = adj(se[ev[t+1]])
+            for (i,j) in se[ev[t]]:
+                if j in adj2[i]:
+                    nb[i] += 1
+            for ii in nb.keys():
+                if nb[ii] != 0:
+                    nb[ii] = nb[ii]/( math.sqrt(len(adj1[ii])*len(adj2[ii])))
+            su += sum(nb.values())
+    return su/( len(V)*(len(ev)-1))
+
+
+# The graph is already instanteneous
+def optimal(g,s):
+    V = list(nodes(g))
+    ev = list(events(g))
+    ev.sort()
+    T = ev[-1]
+    se = seq_graphs(g)
+    opt = {  v:numpy.Infinity for v in V }
+    L = {  v : [] for v in V }
+    for t in ev:
+        G, dt, dr = generateGraph(se[t],s)
+        Vp, optt = modDijkstra(G,dt,dr)
+        for v in Vp:
+            opt[v] = min( opt[v] , (t - T) + optt[v])
+            L[v].append(  (optt[v], t) )
+            deleteRedundant(L)
+    return opt
+
+def generateGraph(g,s):
+    Er = []
+    nod = node_static(g)
+    nod.update([s])
+    dr = {  (v,w) : numpy.Infinity   for v in nod for w in nod}
+    dt = {  (v,w) : numpy.Infinity   for v in nod for w in nod}
+    for (v,w) in g:
+        if v==s:
+            dt[(v,w)] = 
+        else:
+
+
+    
 
 import itertools
 import random
