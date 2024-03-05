@@ -115,7 +115,16 @@ def average_clustering_network2(g):
 
 
 # The graph is already instanteneous
-def optimal(g,s):
+#delta has 2 values corresponding to delta_3 and delta_4 in the paper
+
+import bisect
+#bisect.insort(numbers, element)
+
+def deleteRedundant(L):
+
+
+
+def optimal(g,s,delta):
     V = list(nodes(g))
     ev = list(events(g))
     ev.sort()
@@ -124,27 +133,61 @@ def optimal(g,s):
     opt = {  v:numpy.Infinity for v in V }
     L = {  v : [] for v in V }
     for t in ev:
-        G, dt, dr = generateGraph(se[t],s)
-        Vp, optt = modDijkstra(G,dt,dr)
+        nod, gt, er, dt, dr = generateGraph(se[t], s, t, T, delta, L)
+        Vp, optt = modDijkstra(s, nod, gt, er, dt, dr)
         for v in Vp:
-            opt[v] = min( opt[v] , (t - T) + optt[v])
-            L[v].append(  (optt[v], t) )
-            deleteRedundant(L)
+            opt[v] = min( opt[v] , delta[0]*(t - T) + optt[v])
+            bisect.insort(L[v], (t, optt[v]))
+            deleteRedundant(L[v])
     return opt
 
-def generateGraph(g,s):
-    Er = []
+def generateGraph(g, s, t, T, delta, L):
+    Er = set()
     nod = node_static(g)
     nod.update([s])
     dr = {  (v,w) : numpy.Infinity   for v in nod for w in nod}
     dt = {  (v,w) : numpy.Infinity   for v in nod for w in nod}
     for (v,w) in g:
         if v==s:
-            dt[(v,w)] = 
+            dt[(v,w)] = delta[0]*(T-t) + delta[1]
         else:
+            dt[(v,w)] = delta[1]
+    for v in nod:
+        if v != s:
+            i = 0
+            (a,opta) = L[v][i]
+            while a < t:
+                L[v].pop(i)
+                (a,opta) = L[v][i]
+            if len(L[v]) != 0:
+                Er.add((s,v))
+                opt = min( map(lambda x : x[1], L[v]  )  )
+                dr[(s,v)] = opt
+    # i dont think we have to return nod as well
+    return nod, g, er, dt, dr
 
 
-    
+def modDijkstra(s, vt, gt, er, dt, dr):
+    optt = { v: numpy.Infinity for v in vt   }
+    r = { v: numpy.Infinity for v in vt }
+    r[s] = 0
+    Vp = set()
+    Q = fib.FibonacciHeap()
+    nod = dict()
+    for v in vt:
+        nod[v] = Q.insert( (r[v], v)  )
+    while Q.total_nodes != 0:
+        (x,v) = Q.extract_min().data
+        del nod[v]
+        for (v,w) in gt.union(er):
+            r[w] = min( r[w], r[v] + min( dr[(v,w)], dt[(v,w)]  ) )
+            if (v,w) in gt:
+                optt[w] = min( optt[w], r[v] + dt[(v,w)]  )
+                Vp.add(w)
+    return Vp, optt
+
+
+
 
 import itertools
 import random
