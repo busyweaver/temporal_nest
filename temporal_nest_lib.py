@@ -894,9 +894,8 @@ def to_straph_file(g,s):
             f.write(v+" "+str(mi)+" "+str(ma)+"\n")
     with open(s+"_links.sg","w") as f:
         for u,v in tmp.keys():
-            for (x,y) in [ (u,v),(v,u) ]: 
-                for t in tmp[(u,v)]:
-                    f.write(x+" "+y+" "+str(t)+" "+str(t)+"\n")
+            for t in tmp[(u,v)]:
+                f.write(u+" "+v+" "+str(t)+" "+str(t)+"\n")
 #for static graphs
 def adj(g):
     tmp = dict()
@@ -908,7 +907,7 @@ def adj(g):
     return tmp
 
 def node_static(g):
-    res = {}
+    res = set()
     for (u,v) in g:
         res.add(u)
         res.add(v)

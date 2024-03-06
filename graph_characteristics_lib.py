@@ -8,7 +8,7 @@ import straph.paths.meta_walks as mw
 import straph.betweenness.optimal_paths as opt
 import random
 import numpy
-
+import fibheap as fib
 #max of a set with positive values
 def max_not_inf(s):
     m = -1
@@ -17,7 +17,7 @@ def max_not_inf(s):
             m = e
     return m
 
-def global_efficiency(g,p,approx):
+def global_efficiency(g,p,approx = 1):
     diameter = -1
     su = 0
     to_straph_file(g,"tmp")
@@ -40,6 +40,7 @@ def global_efficiency(g,p,approx):
         for w in S.nodes:
             if v!=w:
                 dvw = min(cur_best[w].values())
+                #print("v", v, "w", w, "dvw", dvw)
                 if dvw != 0:
                     if p == "d":
                         su += (1/(dvw+1))
@@ -57,42 +58,71 @@ def global_efficiency(g,p,approx):
         return  su, diameter
     #return su, diameter
 
+def global_efficiency_imp(g,p):
+    V = nodes(g)
+    ev = list(events(g))
+    ev.sort()
+    se = seq_graphs(g)
+    diameter = -1
+    su = 0
+    if p == "d":
+        delta =  [1,0]
+    else:
+        delta =  [0,1]
 
-# def topological_overlap(g,i,t,ev,se,V):
-#     m = ev.index(t)
-#     gm = adj(se[t])
-#     gmp = adj(se[ev[m+1]])
-#     su = [0,0,0]
-#     for j in V:
-#         if (i in gm and j in gm[i]):
-#             su[1] += 1
-#         if (i in gmp and j in gmp[i]):
-#             su[2] += 1
-#         if (i in gm and j in gm[i]) and (i in gmp and j in gmp[i]):
-#             su[0] += 1
-#     if su[1] ==0 or su[2]==0:
-#         return 0
-#     else:
-#         return su[0]/(math.sqrt( su[1]*su[2]))
-# def average_topological_overlap(g,i,ev,se,V):
-#     #max value
-#     m = ev[-1]
-#     su = 0
-#     for t in ev:
-#         if t != m:
-#             su += topological_overlap(g,i,t,ev,se,V)
-#     return (1/(m-1))*su
-# def average_clustering_network(g, approx):
-#     V = list(nodes(g))
-#     ev = list(events(g))
-#     ev.sort()
-#     se = seq_graphs(g)
-#     sam = random.sample(V, k = int(approx*len(V)))
-#     if len(sam) == 0:
-#         return 0
-#     return (1/len(sam))*sum(  average_topological_overlap(g,i,ev,se,V) for i in sam )
+    for v in V:
+        cur_best = optimal(g,v,delta, V, ev, se)
+        for w in V:
+            if v!=w:
+                dvw = cur_best[w]
+                #print("v", v, "w", w, "dvw", dvw)
+                if dvw != 0:
+                    if p == "d":
+                        su += (1/(dvw+1))
+                    else:
+                        su += (1/dvw)
+                if dvw != numpy.Infinity:
+                    if dvw > diameter:
+                        diameter = dvw
+    N = len(V)
+    return  (1/(N*(N-1)))*su, diameter
+    
 
-def average_clustering_network2(g):
+def topological_overlap(g,i,t,ev,se,V):
+    m = ev.index(t)
+    gm = adj(se[t])
+    gmp = adj(se[ev[m+1]])
+    su = [0,0,0]
+    for j in V:
+        if (i in gm and j in gm[i]):
+            su[1] += 1
+        if (i in gmp and j in gmp[i]):
+            su[2] += 1
+        if (i in gm and j in gm[i]) and (i in gmp and j in gmp[i]):
+            su[0] += 1
+    if su[1] ==0 or su[2]==0:
+        return 0
+    else:
+        return su[0]/(math.sqrt( su[1]*su[2]))
+def average_topological_overlap(g,i,ev,se,V):
+    #max value
+    m = ev[-1]
+    su = 0
+    for t in ev:
+        if t != m:
+            su += topological_overlap(g,i,t,ev,se,V)
+    return (1/(m-1))*su
+def average_clustering_network(g, approx = 1):
+    V = list(nodes(g))
+    ev = list(events(g))
+    ev.sort()
+    se = seq_graphs(g)
+    sam = random.sample(V, k = int(approx*len(V)))
+    if len(sam) == 0:
+        return 0
+    return (1/len(sam))*sum(  average_topological_overlap(g,i,ev,se,V) for i in sam )
+
+def average_clustering_network_imp(g):
     V = list(nodes(g))
     ev = list(events(g))
     ev.sort()
@@ -100,12 +130,12 @@ def average_clustering_network2(g):
     se = seq_graphs(g)
     su = 0
     for t in range(len(ev)):
-        if t != ma:
+        if t != len(ev) - 1:
             nb = { ii : 0 for ii in V }
             adj1 = adj(se[ev[t]])
             adj2 = adj(se[ev[t+1]])
             for (i,j) in se[ev[t]]:
-                if j in adj2[i]:
+                if i in adj2 and j in adj2[i]:
                     nb[i] += 1
             for ii in nb.keys():
                 if nb[ii] != 0:
@@ -115,38 +145,53 @@ def average_clustering_network2(g):
 
 
 # The graph is already instanteneous
-#delta has 2 values corresponding to delta_3 and delta_4 in the paper
+#delta has 2 values corresponding to delta_3 and delta_6 in the paper
 
 import bisect
 #bisect.insort(numbers, element)
 
-def deleteRedundant(L):
+def deleteRedundant(l):
+    i = 0
+    tmp = len(l)
+    while i < tmp - 1:
+        ti = l[i]
+        tj = l[i+1]
+        ai, opti = ti
+        aj, optj = tj
+        if aj <= ai:
+            l.pop(i)
+            i -= 1
+        i += 1
+        tmp = len(l)
+    return l
 
 
-
-def optimal(g,s,delta):
-    V = list(nodes(g))
-    ev = list(events(g))
-    ev.sort()
+def optimal(g,s,delta, V, ev, se):
     T = ev[-1]
-    se = seq_graphs(g)
+
     opt = {  v:numpy.Infinity for v in V }
     L = {  v : [] for v in V }
     for t in ev:
+        #print("time", t)
         nod, gt, er, dt, dr = generateGraph(se[t], s, t, T, delta, L)
         Vp, optt = modDijkstra(s, nod, gt, er, dt, dr)
         for v in Vp:
             opt[v] = min( opt[v] , delta[0]*(t - T) + optt[v])
             bisect.insort(L[v], (t, optt[v]))
+            #print("beofre delete",v, L[v])
             deleteRedundant(L[v])
+            #print("after delete", v,L[v])
     return opt
 
 def generateGraph(g, s, t, T, delta, L):
+    #print("generateGraph(g, s, t, T, delta, L)", g, s, t, T, delta, L)
     Er = set()
     nod = node_static(g)
     nod.update([s])
-    dr = {  (v,w) : numpy.Infinity   for v in nod for w in nod}
-    dt = {  (v,w) : numpy.Infinity   for v in nod for w in nod}
+    # dr = {  (v,w) : numpy.Infinity   for v in nod for w in nod}
+    # dt = {  (v,w) : numpy.Infinity   for v in nod for w in nod}
+    dr = dict()
+    dt = dict()
     for (v,w) in g:
         if v==s:
             dt[(v,w)] = delta[0]*(T-t) + delta[1]
@@ -154,20 +199,28 @@ def generateGraph(g, s, t, T, delta, L):
             dt[(v,w)] = delta[1]
     for v in nod:
         if v != s:
-            i = 0
-            (a,opta) = L[v][i]
-            while a < t:
-                L[v].pop(i)
-                (a,opta) = L[v][i]
+            # following not necessary since no maximal waiting time is fixed
+            # if len(L[v]) != 0:
+            #     print("v", v,  "L[v]", L[v], "t", t)
+            #     i = 0
+            #     (a,opta) = L[v][i]
+            #     while a < t:
+            #         L[v].pop(i)
+            #         if len(L[v]) == 0:
+            #             break
+            #         (a,opta) = L[v][i]
             if len(L[v]) != 0:
                 Er.add((s,v))
+                #print("opt", L[v])
                 opt = min( map(lambda x : x[1], L[v]  )  )
+                #print("opt = ", opt)
                 dr[(s,v)] = opt
     # i dont think we have to return nod as well
-    return nod, g, er, dt, dr
+    return nod, g, Er, dt, dr
 
 
 def modDijkstra(s, vt, gt, er, dt, dr):
+    # print("modDijkstra(s, vt, gt, er, dt, dr)", s, vt, gt, er, dt, dr)
     optt = { v: numpy.Infinity for v in vt   }
     r = { v: numpy.Infinity for v in vt }
     r[s] = 0
@@ -180,13 +233,17 @@ def modDijkstra(s, vt, gt, er, dt, dr):
         (x,v) = Q.extract_min().data
         del nod[v]
         for (v,w) in gt.union(er):
-            r[w] = min( r[w], r[v] + min( dr[(v,w)], dt[(v,w)]  ) )
+            x = numpy.Infinity
+            if (v,w) in dr:
+                x = dr[(v,w)]
+            y = numpy.Infinity
+            if (v,w) in dt:
+                y = dt[(v,w)]
+            r[w] = min( r[w], r[v] + min( x, y  ) )
             if (v,w) in gt:
-                optt[w] = min( optt[w], r[v] + dt[(v,w)]  )
+                optt[w] = min( optt[w], r[v] + y  )
                 Vp.add(w)
     return Vp, optt
-
-
 
 
 import itertools
