@@ -168,7 +168,6 @@ def deleteRedundant(l):
 
 def optimal(g,s,delta, V, ev, se):
     T = ev[-1]
-
     opt = {  v:numpy.Infinity for v in V }
     L = {  v : [] for v in V }
     for t in ev:
