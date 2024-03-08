@@ -486,7 +486,7 @@ def statistics_rewirings_clus(path,names,cut,nb_rewire,folder, folder_res, appro
                 x,y,z = randomize(g_new,nb_rewire,col,names[k][-1])
                 fg.write(names[k][1])
                 for e in [g_new,x,y,z]:
-                    fg.write(" & $ "+str(float(average_clustering_network2(e)))[:5]+" $,")
+                    fg.write(" & $ "+str(float(average_clustering_network_imp(e)))[:5]+" $,")
                     print("clust ok")
                 fg.write("\\\\ \n")
 
