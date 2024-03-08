@@ -428,7 +428,7 @@ def statistics_rewirings(path,names,cut,nb_rewire, iter_pandemy, folder, folder_
                 x,y,z = randomize(g_new,nb_rewire,col,names[k][-1])
                 fg.write(names[k][1])
                 for e in [g_new,x,y,z]:
-                    fg.write(" & $ "+str(float(average_clustering_network(e,approx)))[:5]+" $,")
+                    fg.write(" & $ "+str(float(average_clustering_network2(e,approx)))[:5]+" $,")
                     print("clust ok")
                 for e in [g_new,x,y,z]:
                     fg.write(" & $ "+str(float(global_efficiency(e,"s",approx)[0]))[:5]+" $ ,")
@@ -465,59 +465,35 @@ def statistics_rewirings(path,names,cut,nb_rewire, iter_pandemy, folder, folder_
 # In[3]:
 
 
-def statistics_rewirings_diff(path,names,cut,nb_rewire,iter_pandemy,folder, folder_res, approx, wl_it = -1,look_ahead = 1):
-    print("stats diffusion")
+def statistics_rewirings_clus(path,names,cut,nb_rewire,folder, folder_res, approx, wl_it = -1,look_ahead = 1):
+    print("stats rewirings")
     files = [f for f in os.listdir(folder_res) if os.path.isfile(folder_res+f)]
-    s = "table_diff_"+str(iter_pandemy)+".tex"
+    s = "table_charac.tex"
     if s not in files:
         fg = open(folder_res+s, "w")
         for k in range(0,len(names)):
-            print("diffusion ", names[k][0])
+            print("statistics_rewirings",  names[k][0])
             g = read_graph(path,names[k][0], names[k][-1])
-            g_new = graph_cut(g,names[k][-1],cut)
+            g_new = graph_cut(g,names[k][-1], cut)
             m = max(events(g_new))
             names_keep = folder+names[k][1]+"_"+str(1)+"_"+str(cut)+"_keep"
             max_wl = find_max_wl(folder, names_keep)
+            # if want max iteration do this
+            # col = read_dic(names_keep+"_"+str(max_wl))
             col = read_dic(names_keep+"_"+str(1))
-    #         _, col, _, _ = weisfeiler_lehman_graph_hash(g_new, iterations = wl_it,  look_ahead = look_ahead)
-            #nb = len(rewirings(g_new,col, names[k][-1]))
             nb = 1
-            rates = [0.1,0.2,0.3]
-    #         print(nb)
             if nb != 0:
-                l = randomize(g_new,nb_rewire,col,names[k][-1])
-                l = [g_new] + list(l)
-                average = dict( { e:dict(  {ee : 0 for ee in range(len(l)) } )  for e in rates }  )
-                pan = 0
-                while pan <= iter_pandemy:
-                    print("pan", pan)
-                    for rate in rates:
-                        for i in range(len(l)):
-                            b = False
-                            tries = 0
-    #                         print("pan", pan, "rate", rate, "i",i)
-                            while not b and tries < 100:
-#                                 print("tries", tries)
-                                r = SI(l[i], rate, thresh = rate*(1/1000))
-                                if r[2] != 0:
-                                    b = True
-                                tries += 1
-                            if tries == 100:
-                                print("too many unsuceeded tries for outbreak")
-    #                         print("r",r)
-    #                         print(average)
-                            average[rate][i] += (r[1]/iter_pandemy)
-                    pan += 1
-
-
-                fg.write(names[k][1]+" ")
-                for rate in rates:
-                    for i in range(len(l)):
-                        fg.write("$ "+str(float(average[rate][i]))[:5]+" $ ")
+                x,y,z = randomize(g_new,nb_rewire,col,names[k][-1])
+                fg.write(names[k][1])
+                for e in [g_new,x,y,z]:
+                    fg.write(" & $ "+str(float(average_clustering_network2(e)))[:5]+" $,")
+                    print("clust ok")
                 fg.write("\\\\ \n")
+
         fg.close()
     else:
-        print("already present")
+        print("file statistics_rewirings already present")
+
 
 
 # In[4]:
@@ -525,24 +501,4 @@ def statistics_rewirings_diff(path,names,cut,nb_rewire,iter_pandemy,folder, fold
 
 nb_rewire = 100
 nb_pandemy = 10
-statistics_rewirings(path,names,cut,nb_rewire, nb_pandemy, folder, folder_res, approx)
-
-
-# In[ ]:
-
-
-#statistics_rewirings_diff(path,names,cut,nb_rewire, nb_pandemy,folder, folder_res, approx)
-
-
-# In[ ]:
-
-
-# make directed graphs and check on them number of rewirings
-# make bins with fixed amout of edges in each one and do the rest rewirings etc
-
-
-# In[ ]:
-
-
-
-
+statistics_rewirings_clus(path,names,cut,nb_rewire, folder, folder_res, approx)

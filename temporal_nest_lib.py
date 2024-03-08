@@ -291,6 +291,9 @@ def weisfeiler_lehman_graph_hash(
     #print("end node label")
     if save_each_step:
         save_dic(name_save+"_"+str(1) , node_labels)
+    if keep_iterations:
+        keep[1] = node_labels        
+
     #print("end firt save")
     subgraph_hash_counts = []
     i = -1
@@ -322,10 +325,7 @@ def possible_flips_at(node_set, col,se,t):
     for x in se[t]:
         for v in node_set:
             if col[(x[1],t)] == col[(v,t)] and x[1] != v and x[0] != v:
-                if t in res:
                     res.add(( (x[0],x[1],t), (x[0],v,t) ))
-                else:
-                    res = {( (x[0],x[1],t), (x[0],v,t) )}
                     
     return res
     
@@ -430,8 +430,18 @@ def rewirings_at_time(seq_g,col,t):
 #                         print("color", (a,t), (c,t), (b,t), (d,t))
                     # maybe add condition if a==c , not rewire because it does not change anything : update done
                     if col[(a,t)] == col[(c,t)] and col[(b,t)] == col[(b,t)]:
-                        if (a,d) not in edges and (c,b) not in edges and a!= c and a!=d and b!=c and ((c,d,t),(a,b,t)) not in res:
-                            res.add(((a,b,t),(c,d,t)))
+
+                        if (a,d) not in edges and (c,b) not in edges and a!= c and a!=d and b!=c:
+                            l1 = [a,b]
+                            l1.sort()
+                            l2 = [c,d]
+                            l2.sort()
+                            if l1[0] > l2[0]:
+                                rew = ( (l2[0], l2[1], t), (l1[0], l1[1], t) )
+                            else:
+                                rew = ( (l1[0], l1[1], t), (l2[0], l2[1], t) )
+                            if rew not in res:
+                                res.add(rew)
     return res
 
 def rewirings_at_time_felix(seq_g,col,t):
