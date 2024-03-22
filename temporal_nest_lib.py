@@ -320,6 +320,39 @@ def weisfeiler_lehman_graph_hash(
 
 # works only for directed
 
+def node_partition(V, t, col):
+    res = dict()
+    for v in V:
+        if col[(v,t)] not in res:
+            res[col[(v,t)]] = {v}
+        else:
+            res[col[(v,t)]].add(v)
+    return res
+
+def edge_partition(se,t):
+    res = dict()
+    in_deg = dict()
+    for e in se:
+        if (col[(e[0],t)], col[(e[1],t)]) not in res:
+            res[(col[(e[0],t)], col[(e[1],t)])] = {e}
+        else:
+            res[(col[(e[0],t)], col[(e[1],t)])].add(e)
+    return res
+
+def in_deg_direc(se, t):
+    in_deg = dict()
+    for e in se:
+        if e[1] in in_deg:
+            if col[(e[0],t)] in in_deg[e[1]]:
+                in_deg[e[1]][col[(e[0],t)]] += 1
+            else:
+                in_deg[e[1]][col[(e[0],t)]] = 1
+        else:
+            in_deg[e[1]] = dict()
+            in_deg[e[1]][col[(e[0],t)]] = 1
+    return in_deg
+
+
 def possible_flips_at(node_set, col,se,t):
     res = set()
     for x in se[t]:
@@ -328,7 +361,10 @@ def possible_flips_at(node_set, col,se,t):
                     res.add(( (x[0],x[1],t), (x[0],v,t) ))
                     
     return res
-    
+
+
+
+
 def possible_felix_flips(node_set,ev,col,se):
     res = dict()
     for t in ev:
@@ -351,6 +387,68 @@ def felix_flip(g,se,col,possible_flips):
     se[t].remove((x[0][0],x[0][1]))
     se[t].add((x[1][0],x[1][1]))
     return g,se,x
+
+
+def nb_possible_felix(col, V, t, se):
+    np = node_partition(V, t, col)
+    ep = edge_partition(se,t)
+    indeg = in_deg_direc(se, t)
+    nb = 0
+    for e in ep.keys():
+        if e[0] == e[1]:
+            nb += (len(np[e[0]]) - 1)*len(ep[e]) - sum(   indeg[v][e[0]] for (u,v) in ep[e] )
+        else:
+            nb += len(np[e[0]]) *len(ep[e]) - sum(   indeg[v][e[0]] for (u,v) in ep[e] )
+    return nb
+
+
+def felix_flip_bins(g,se,V,col,t):
+    np = node_partition(V, t, col)
+    ep = edge_partition(se,t)
+    b = False
+    while not b:
+        x = random.randint(0, len(se))
+        e = se[x]
+        if len(np[col[e[1]]]) > 1:
+            b = True
+            bb = False
+            lelem = list(np[col[e[1]]])
+            while not bb:
+                y = random.randint(0, len(np[col[e[1]]]) -1)
+                if lelem[y] != e[1]:
+                    bb = True
+                se.remove(e)
+                se.add(  (e[0], lelem[y]) )
+
+                g.remove( tuple(e + t)  )
+                g.add( (e[0], lelem[y],t)  )
+
+
+def felix_flips_imp(gg,n,col):
+    g = set(gg.copy())
+    se = seq_graphs(g)
+    node_set = nodes(g)
+    ev = events(g)
+    nb_possible = dict()
+    su = 0
+    for t in ev:
+        nb_possible[t] = nb_possible_felix(col, node_set, t, se[t])
+        su += nb_possible[t]
+    if su == 0:
+        print("no possible flips")
+        return -1
+
+    for _ in range(n):
+        x = random.randint(0,su-1)
+        for t in ev:
+            x = x-nb_possible[t]
+            if x < 0:
+                break
+
+        g,se = felix_flip_bins(g,se[t],node_set,col,t)
+
+    return list(g)
+
 
 def felix_flips(gg,n,col):
     g = set(gg.copy())
