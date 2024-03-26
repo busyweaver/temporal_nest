@@ -329,7 +329,7 @@ def node_partition(V, t, col):
             res[col[(v,t)]].add(v)
     return res
 
-def edge_partition(se,t):
+def edge_partition(se,t,col):
     res = dict()
     in_deg = dict()
     for e in se:
@@ -339,7 +339,7 @@ def edge_partition(se,t):
             res[(col[(e[0],t)], col[(e[1],t)])].add(e)
     return res
 
-def in_deg_direc(se, t):
+def in_deg_direc(se, t, col):
     in_deg = dict()
     for e in se:
         if e[1] in in_deg:
@@ -359,7 +359,6 @@ def possible_flips_at(node_set, col,se,t):
         for v in node_set:
             if col[(x[1],t)] == col[(v,t)] and x[1] != v and x[0] != v:
                     res.add(( (x[0],x[1],t), (x[0],v,t) ))
-                    
     return res
 
 
@@ -391,37 +390,54 @@ def felix_flip(g,se,col,possible_flips):
 
 def nb_possible_felix(col, V, t, se):
     np = node_partition(V, t, col)
-    ep = edge_partition(se,t)
-    indeg = in_deg_direc(se, t)
+    ep = edge_partition(se,t,col)
+    indeg = in_deg_direc(se, t,col)
+    # print("node_part", np)
+    # print("edge part", ep)
+    # print("indeg", indeg)
     nb = 0
     for e in ep.keys():
+
         if e[0] == e[1]:
-            nb += (len(np[e[0]]) - 1)*len(ep[e]) - sum(   indeg[v][e[0]] for (u,v) in ep[e] )
+            #nb += (len(np[e[1]]) - 1)*len(ep[e]) - sum(   indeg[v][e[0]] for (u,v) in ep[e] )
+            nb += (len(np[e[1]]) - 1)*len(ep[e]) - sum(   indeg[v][e[0]] if e[0] in indeg[v] and col[(v,t)]==e[1] else 0 for v in indeg.keys() )
         else:
-            nb += len(np[e[0]]) *len(ep[e]) - sum(   indeg[v][e[0]] for (u,v) in ep[e] )
+            #nb += len(np[e[1]]) *len(ep[e]) - sum(   indeg[v][e[0]] for (u,v) in ep[e] )
+            nb += len(np[e[1]]) *len(ep[e]) - sum(   indeg[v][e[0]] if e[0] in indeg[v] and col[(v,t)]==e[1] else 0 for v in indeg.keys() )
     return nb
 
 
 def felix_flip_bins(g,se,V,col,t):
     np = node_partition(V, t, col)
-    ep = edge_partition(se,t)
+    ep = edge_partition(se[t],t, col)
+    lse = list(se[t])
     b = False
     while not b:
-        x = random.randint(0, len(se))
-        e = se[x]
-        if len(np[col[e[1]]]) > 1:
+        x = random.randint(0, len(se[t])-1)
+        e = lse[x]
+        if len(np[col[(e[1],t)]]) > 1:
             b = True
             bb = False
-            lelem = list(np[col[e[1]]])
+            lelem = list(np[col[(e[1],t)]])
             while not bb:
-                y = random.randint(0, len(np[col[e[1]]]) -1)
+                y = random.randint(0, len(np[col[(e[1],t)]]) -1)
                 if lelem[y] != e[1]:
                     bb = True
-                se.remove(e)
-                se.add(  (e[0], lelem[y]) )
+                se[t].remove(e)
+                se[t].add(  (e[0], lelem[y]) )
 
-                g.remove( tuple(e + t)  )
+                g.remove( tuple(list(e) + [t])  )
                 g.add( (e[0], lelem[y],t)  )
+    return g, se
+
+
+def nb_felix_flips_improved(ev, se, node_set, col):
+    nb_possible = dict()
+    su = 0
+    for t in ev:
+        nb_possible[t] = nb_possible_felix(col, node_set, t, se[t])
+        su += nb_possible[t]
+    return nb_possible, su
 
 
 def felix_flips_imp(gg,n,col):
@@ -429,24 +445,17 @@ def felix_flips_imp(gg,n,col):
     se = seq_graphs(g)
     node_set = nodes(g)
     ev = events(g)
-    nb_possible = dict()
-    su = 0
-    for t in ev:
-        nb_possible[t] = nb_possible_felix(col, node_set, t, se[t])
-        su += nb_possible[t]
+    nb_possible, su = nb_felix_flips_improved(ev, se, node_set, col)
     if su == 0:
         print("no possible flips")
         return -1
-
     for _ in range(n):
         x = random.randint(0,su-1)
         for t in ev:
             x = x-nb_possible[t]
             if x < 0:
                 break
-
-        g,se = felix_flip_bins(g,se[t],node_set,col,t)
-
+        g,se = felix_flip_bins(g,se,node_set,col,t)
     return list(g)
 
 
@@ -1028,7 +1037,8 @@ def randomize(g,n,col,dire):
     if dire == "u":
         g1 = rewire_any(g,n,col,dire)
     else:
-        g1 = felix_flips(g,n,col)
+        g1 = felix_flips_imp(g,n,col)
+        #g1 = felix_flips(g,n,col)
     print("fin g1")
     g2 = randomized_edge_same_time(g,dire, n)
     print("fin g2")
