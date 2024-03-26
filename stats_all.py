@@ -479,8 +479,8 @@ def statistics_rewirings_clus(path,names,cut,nb_rewire,folder, folder_res, appro
             names_keep = folder+names[k][1]+"_"+str(1)+"_"+str(cut)+"_keep"
             max_wl = find_max_wl(folder, names_keep)
             # if want max iteration do this
-            col = read_dic(names_keep+"_"+str(max_wl))
-            #col = read_dic(names_keep+"_"+str(1))
+            #col = read_dic(names_keep+"_"+str(max_wl))
+            col = read_dic(names_keep+"_"+str(1))
             nb = 1
             if nb != 0:
                 x,y,z = randomize(g_new,nb_rewire,col,names[k][-1])
