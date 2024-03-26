@@ -465,7 +465,7 @@ def statistics_rewirings(path,names,cut,nb_rewire, iter_pandemy, folder, folder_
 # In[3]:
 
 
-def statistics_rewirings_clus(path,names,cut,nb_rewire,folder, folder_res, approx, wl_it = -1,look_ahead = 1):
+def statistics_rewirings_clus(path,names,cut,nb_rewire,folder, folder_res, iter_pandemy, wl_it = -1,look_ahead = 1):
     print("stats rewirings")
     files = [f for f in os.listdir(folder_res) if os.path.isfile(folder_res+f)]
     s = "table_charac.tex"
@@ -521,4 +521,4 @@ def statistics_rewirings_clus(path,names,cut,nb_rewire,folder, folder_res, appro
 
 nb_rewire = 200
 nb_pandemy = 1
-statistics_rewirings_clus(path,names,cut,nb_rewire, folder, folder_res, approx)
+statistics_rewirings_clus(path,names,cut,nb_rewire, folder, folder_res, nb_pandemy)
