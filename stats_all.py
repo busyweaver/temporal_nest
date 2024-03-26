@@ -469,8 +469,10 @@ def statistics_rewirings_clus(path,names,cut,nb_rewire,folder, folder_res, appro
     print("stats rewirings")
     files = [f for f in os.listdir(folder_res) if os.path.isfile(folder_res+f)]
     s = "table_charac.tex"
+    s2 = "table_diff_"+str(iter_pandemy)+".tex"
     if s not in files:
         fg = open(folder_res+s, "w")
+        fg2 = open(folder_res+s2, "w")
         for k in range(0,len(names)):
             print("statistics_rewirings",  names[k][0])
             g = read_graph(path,names[k][0], names[k][-1])
@@ -490,6 +492,24 @@ def statistics_rewirings_clus(path,names,cut,nb_rewire,folder, folder_res, appro
                     print("clust ok")
                 fg.write("\\\\ \n")
 
+                # DIFFUSIONS
+                l = [g_new,x,y,z]
+                rates = [0.1,0.2,0.3]
+                average = dict( { e:dict(  {ee : 0 for ee in range(len(l)) } )  for e in rates }  )
+                pan = 0
+                while pan < iter_pandemy:
+                    print("pan", pan)
+                    for rate in rates:
+                        for i in range(len(l)):
+                            r = SI(l[i], rate, iterations = 10)
+                            average[rate][i] += (r[1]/iter_pandemy)
+                    pan += 1
+                fg2.write(names[k][1]+" ")
+                for rate in rates:
+                    for i in range(len(l)):
+                        fg2.write("$ "+str(float(average[rate][i]))[:5]+" $ ")
+                fg2.write("\\\\ \n")
+
         fg.close()
     else:
         print("file statistics_rewirings already present")
@@ -500,5 +520,5 @@ def statistics_rewirings_clus(path,names,cut,nb_rewire,folder, folder_res, appro
 
 
 nb_rewire = 200
-nb_pandemy = 10
+nb_pandemy = 1
 statistics_rewirings_clus(path,names,cut,nb_rewire, folder, folder_res, approx)
