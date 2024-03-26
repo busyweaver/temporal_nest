@@ -793,8 +793,7 @@ def number_rewirings_randomized_same_time(g):
                 nb += x[1]
     return nb
     
-        
-    
+
 def randomized_edge_same_time(g, dire, tout = -1):
     edges = list(g)
     d = seq_graphs(g)
@@ -804,23 +803,22 @@ def randomized_edge_same_time(g, dire, tout = -1):
     else:
         fin = tout
     r = 0
-    rr = 0            
-    
+    rr = 0
     rewired = False
 #     print("fin", fin)
     while r < fin:
-        
         if rr == len(edges):
             print("randomized_edge_same_time : probleme no possible rewirings to finish job ", r, "rewirings done out of ", fin)
-            return set(edges)
+            return randomized_edge_same_time(set(edges), dire, fin-r)
+            #return set(edges)
         i,j,t = edges[rr]
-        
         while rr<len(edges)-1 and not check_rewire(d[t],i,j)[0]:
             rr += 1
             i,j,t = edges[rr]
         if not check_rewire(d[t],i,j)[0]:
             print("randomized_edge_same_time : probleme no possible rewirings to finish job ", r, "rewirings done out of ", fin)
-            return set(edges)
+            return randomized_edge_same_time(set(edges), dire, fin-r)
+            #return set(edges)
         s = random.randint(0,len(d[t])-1)
         ip, jp = list(d[t])[s]
         b = random.randint(0,1)
@@ -831,27 +829,21 @@ def randomized_edge_same_time(g, dire, tout = -1):
             if dire == "u":
                 x = edges.index( (j,i,t) )
                 edges.pop(x)
-            
 #             print("1", (ip,jp,t) in edges or (jp,ip,t) in edges)
             x = edges.index( (ip,jp,t) )
             edges.pop(x)
             if dire == "u":
                 x = edges.index( (jp,ip,t) )
                 edges.pop(x)
-                
-            
             d[t].remove((i,j))
             if dire == "u":
                 d[t].remove((j,i))
-            
             d[t].remove((ip,jp))
             if dire == "u":
                 d[t].remove((jp,ip))
-            
             d[t].add((i,jp))
             if dire == "u":
                 d[t].add((jp,i))
-                
             d[t].add((j,ip))
             if dire == "u":
                 d[t].add((ip,j))
