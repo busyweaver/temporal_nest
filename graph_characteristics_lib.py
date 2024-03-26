@@ -141,7 +141,8 @@ def average_clustering_network_imp(g):
                 if nb[ii] != 0:
                     nb[ii] = nb[ii]/( math.sqrt(len(adj1[ii])*len(adj2[ii])))
             su += sum(nb.values())
-    return su/( len(V)*(len(ev)-1))
+    return su
+    #return su/( len(V)*(len(ev)-1))
 
 
 # The graph is already instanteneous
