@@ -293,7 +293,7 @@ def SI(g, rate,  thresh  = 0.03, horizon = "sr", rate_rec = 0, iterations = math
 #         print("current_infected", current_infected)
         capacity = diffuse_pandemic(g, nei, healthy, current_infected, infected, {}, rate, rate_rec, look_ahead_num)
         itera += 1
-    return itera, len(infected)/(len(lV)*len(l_ev)), capacity
+    return itera, len(infected), capacity
 
 def diffuse_pandemic(g, nei, healthy, current_infected, infected, recovered, rate_inf, rate_rec, lkn):
 #     print("current_infected", current_infected)
