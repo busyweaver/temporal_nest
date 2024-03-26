@@ -792,7 +792,6 @@ def number_rewirings_randomized_same_time(g):
             if x[0]:
                 nb += x[1]
     return nb
-    
 
 def randomized_edge_same_time(g, dire, tout = -1):
     edges = list(g)
