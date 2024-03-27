@@ -497,24 +497,26 @@ def statistics_rewirings_clus(path,names,cut,nb_rewire,folder, folder_res, iter_
                 fg.write("\\\\ \n")
 
                 # DIFFUSIONS
-                l = [g_new,x,y,z]
-                rates = [0.1,0.2,0.3]
-                average = dict( { e:dict(  {ee : 0 for ee in range(len(l)) } )  for e in rates }  )
-                pan = 0
-                while pan < iter_pandemy:
-                    print("pan", pan)
-                    for rate in rates:
-                        for i in range(len(l)):
-                            r = SI(l[i], rate, iterations = 10)
-                            average[rate][i] += (r[1]/iter_pandemy)
-                    pan += 1
-                fg2.write(names[k][1]+" ")
-                for rate in rates:
-                    for i in range(len(l)):
-                        fg2.write("$ "+str(float(average[rate][i]))[:5]+" $ ")
-                fg2.write("\\\\ \n")
+                # l = [g_new,x,y,z]
+                # rates = [0.1,0.2,0.3]
+                # average = dict( { e:dict(  {ee : 0 for ee in range(len(l)) } )  for e in rates }  )
+                # pan = 0
+                # while pan < iter_pandemy:
+                #     print("pan", pan)
+                #     for rate in rates:
+                #         for i in range(len(l)):
+                #             r = SI(l[i], rate, iterations = 10)
+                #             average[rate][i] += (r[1]/iter_pandemy)
+                #     pan += 1
+                # fg2.write(names[k][1]+" ")
+                # for rate in rates:
+                #     for i in range(len(l)):
+                #         fg2.write("$ "+str(float(average[rate][i]))[:5]+" $ ")
+                # fg2.write("\\\\ \n")
+
 
         fg.close()
+        fg2.close()
     else:
         print("file statistics_rewirings already present")
 
