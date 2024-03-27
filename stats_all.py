@@ -527,6 +527,6 @@ def statistics_rewirings_clus(path,names,cut,nb_rewire,folder, folder_res, iter_
 # In[4]:
 
 
-nb_rewire = 2000
+nb_rewire = 20000
 nb_pandemy = 1
 statistics_rewirings_clus(path,names,cut,nb_rewire, folder, folder_res, nb_pandemy)
