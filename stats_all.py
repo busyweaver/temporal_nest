@@ -272,7 +272,11 @@ for k in range(len(names)):
 #         print(l)
 #             print(look_aheads, l, dd[it])
 #             print(i,j)
-        axs[j, i].plot( look_aheads ,l, alpha=(it+1)/(m+1), color = names[k][2], label= "iter "+str(it+1))
+        if i <= 1 and j <= 1:
+            axs[j, i].semilogy( look_aheads ,l, alpha=(it+1)/(m+1), color = names[k][2], label= "iter "+str(it+1))
+        else:
+            axs[j, i].plot( look_aheads ,l, alpha=(it+1)/(m+1), color = names[k][2], label= "iter "+str(it+1))
+
         axs[j, i].legend()
 #             axs[j, i].plot( [0,1], [0,1],alpha=0.5, color = names[k][2])
 #     if j == 0 and i == 0:
@@ -519,6 +523,6 @@ def statistics_rewirings_clus(path,names,cut,nb_rewire,folder, folder_res, iter_
 # In[4]:
 
 
-nb_rewire = 200
+nb_rewire = 2000
 nb_pandemy = 1
 statistics_rewirings_clus(path,names,cut,nb_rewire, folder, folder_res, nb_pandemy)

@@ -423,12 +423,13 @@ def felix_flip_bins(g,se,V,col,t):
                 y = random.randint(0, len(np[col[(e[1],t)]]) -1)
                 if lelem[y] != e[1]:
                     bb = True
-                #if create self loop do not do it
-                se[t].remove(e)
-                se[t].add(  (e[0], lelem[y]) )
+                #if create self loop do not do it, this also allows self loops in the markov chain
+                if lelem[y] != e[0]:
+                    se[t].remove(e)
+                    se[t].add(  (e[0], lelem[y]) )
 
-                g.remove( tuple(list(e) + [t])  )
-                g.add( (e[0], lelem[y],t)  )
+                    g.remove( tuple(list(e) + [t])  )
+                    g.add( (e[0], lelem[y],t)  )
     return g, se
 
 
@@ -601,6 +602,13 @@ def rewiring_one(g_new, rewire, se, dire):
     su = 0
     for t in rewire.keys():
         su += len(rewire[t])
+
+    #allow self loop in markov chain
+    esq = len(g_new)*len(g_new)
+    x = random.randint(0,esq-1)
+    if x >= su:
+        g_new, se, -1, -1
+
 #     print("is possible?", possible_rewire)
 #     m = max(events(g))
     r = -1
