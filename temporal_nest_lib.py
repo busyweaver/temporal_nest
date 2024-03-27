@@ -423,6 +423,7 @@ def felix_flip_bins(g,se,V,col,t):
                 y = random.randint(0, len(np[col[(e[1],t)]]) -1)
                 if lelem[y] != e[1]:
                     bb = True
+                #if create self loop do not do it
                 se[t].remove(e)
                 se[t].add(  (e[0], lelem[y]) )
 
