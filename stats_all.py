@@ -272,11 +272,7 @@ for k in range(len(names)):
 #         print(l)
 #             print(look_aheads, l, dd[it])
 #             print(i,j)
-        if i <= 1 and j <= 1:
-            axs[j, i].semilogy( look_aheads ,l, alpha=(it+1)/(m+1), color = names[k][2], label= "iter "+str(it+1))
-        else:
-            axs[j, i].plot( look_aheads ,l, alpha=(it+1)/(m+1), color = names[k][2], label= "iter "+str(it+1))
-
+        axs[j, i].plot( look_aheads ,l, alpha=(it+1)/(m+1), color = names[k][2], label= "iter "+str(it+1))
         axs[j, i].legend()
 #             axs[j, i].plot( [0,1], [0,1],alpha=0.5, color = names[k][2])
 #     if j == 0 and i == 0:
@@ -332,8 +328,11 @@ for k in range(len(names)):
             #if cummulative uncomment following
             y1 = [  sum(l_val1[:ii+1]) for ii in range(len(l_ev1))  ]
             l_ev1 = [  e/m_ev1 for e in l_ev1 ]
-            axs[j, i].plot( l_ev1 ,y1, alpha=1/2, color = c, label= "iter 0 "+str(a)[:4])
-            
+            if i <= 1 and j <= 1:
+                axs[j, i].semilogy( l_ev1 ,y1, alpha=1/2, color = c, label= "iter 0 "+str(a)[:4])
+            else:
+                axs[j, i].plot( l_ev1 ,y1, alpha=1/2, color = c, label= "iter 0 "+str(a)[:4])
+
         if len(dd[a][m_it].keys()) != 0:
             m_ev2 = max(dd[a][m_it].keys())
             l_ev2 = list(dd[a][m_it].keys())
@@ -342,7 +341,10 @@ for k in range(len(names)):
             y2 = [dd[a][m_it][t] for t in l_ev2  ]
             y2 = [  sum(l_val2[:ii+1]) for ii in range(len(l_ev2))  ]
             l_ev2 = [  e/m_ev2 for e in l_ev2 ]
-            axs[j, i].plot( l_ev2 ,y2, alpha=1, color = c, label= "iter inf"+str(a)[:4])
+            if i <= 1 and j <= 1:
+                axs[j, i].semilogy( l_ev2 ,y2, alpha=1, color = c, label= "iter inf"+str(a)[:4])
+            else:
+                axs[j, i].plot( l_ev2 ,y2, alpha=1, color = c, label= "iter inf"+str(a)[:4])
         axs[j, i].legend()
 
     axs[j,i].set(xlabel = "% time" , ylabel='# rewirings', )
