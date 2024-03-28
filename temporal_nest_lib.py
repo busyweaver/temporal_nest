@@ -83,11 +83,12 @@ def reverse_neighbour_temp(v,t,g):
     return res
 
 
-
+# we are not using look ahead argument in the following, because for large databases it is not efficient to repeat neighberhood for node v at different times, i keep the parameter for now
 def all_graph_neighbour_node(g, nod, l_ev, reverse = False, look_ahead = 1):
     res = dict()
     m = l_ev[-1]
-    look_ahead_num = int( look_ahead * m )
+    mi = l_ev[0]
+    look_ahead_num = int( look_ahead * (m - mi) )
     for (a,b,tpp) in g:
         if reverse:
             if a not in res:
@@ -111,7 +112,8 @@ def all_graph_neighbour_imp(g, nod, ev, reverse = False, look_ahead = 1):
     res = dict()
     l_ev = list(ev)
     m = max(ev)
-    look_ahead_num = int( look_ahead * m )
+    mi = min(ev)
+    look_ahead_num = int( look_ahead * (m - mi) )
     for (a,b,tpp) in g:
         if reverse:
             l_ev.sort(reverse = True)
@@ -182,7 +184,7 @@ def degrees(g, nod, l_ev, reverse, look_ahead):
     print("begin all neigbour")
     nei = all_graph_neighbour_node(g, nod, l_ev, reverse, look_ahead)
     print("end all neigbour")
-    look_ahead_num = int( look_ahead * l_ev[-1] )
+    look_ahead_num = int( look_ahead * (l_ev[-1] - l_ev[0]) )
     for v in nod:
         for t in l_ev:
             res[(v,t)] = len(neighb(nei[v],t, look_ahead_num))
@@ -224,13 +226,13 @@ def _init_node_labels(G, nod, l_ev, reverse, look_ahead):
     d,nei = degrees(G, nod, l_ev, reverse, look_ahead)
     return {u: str(d[u]) for u in d.keys()}, nei
 
-def _neighborhood_aggregate(v, t, node_labels, nei, m, look_ahead):
+def _neighborhood_aggregate(v, t, node_labels, nei, ma, mi, look_ahead):
     """
     Compute new labels for given node by aggregating
     the labels of each node's neighbors.
     """
     #print("nei agg", v, t, nei)
-    look_ahead_num = int( look_ahead * m )
+    look_ahead_num = int( look_ahead * (ma - mi) )
     label_list = []
 #     print(node_labels)
     for nbr in neighb(nei, t, look_ahead_num):
@@ -274,7 +276,7 @@ def weisfeiler_lehman_graph_hash(
         #nei = all_graph_neighbour_imp(G, nod, ev, reverse, look_ahead)
         for node in nod:
             for t in l_ev:
-                label = _neighborhood_aggregate(node, t, labels, nei[node], l_ev[-1], look_ahead)
+                label = _neighborhood_aggregate(node, t, labels, nei[node], l_ev[-1], l_ev[0], look_ahead)
                 new_labels[(node,t)] = _hash_label(label, digest_size)
         return new_labels
     nod = nodes(G)
@@ -699,7 +701,6 @@ def randomized_edge(g, dire, tout = -1):
     else:
         fin = tout
     nb_rewired = 0
-    rewired = False
     while nb_rewired < fin:
 #         print("r", r,end =" ")
 #         nb = nb_randomized_edge(g)
@@ -741,7 +742,6 @@ def randomized_edge(g, dire, tout = -1):
                 edges.append( (ip,j,tp) )
                 d[tp].add((ip,j))
                         
-            rewired = True
         elif not b and r != s and i!=ip and j!=jp and (i,ip) not in d[t] and (j,jp) not in d[tp]:
             edges.pop(r)
             d[t].remove((i,j))
@@ -771,10 +771,7 @@ def randomized_edge(g, dire, tout = -1):
                 edges.append( (jp,j,tp) )
                 d[tp].add((jp,j))
                 
-            rewired = True
-        if rewired:
-            nb_rewired += 1
-            rewired = False
+        nb_rewired += 1
     if nb_rewired < fin:
         print("randomized edge : probleme no possible rewirings to finish job ", r, "rewirings done out of ", fin)
     return set(edges)
@@ -805,30 +802,26 @@ def number_rewirings_randomized_same_time(g):
 def randomized_edge_same_time(g, dire, tout = -1):
     edges = list(g)
     d = seq_graphs(g)
-    random.shuffle(edges)
     if tout == -1:
         fin = len(edges)
     else:
         fin = tout
     r = 0
-    rr = 0
-    rewired = False
+    dist = []
+    possible_t = []
+    ld = dict()
+    ev = events(g)
+    for t in ev:
+        ld[t] = list(d[t])
+        if len(d[t]) > 1:
+            dist.append(len(d[t])*(len(d[t]) -1)/2 )
+            possible_t.append(t)
 #     print("fin", fin)
     while r < fin:
-        if rr == len(edges):
-            print("randomized_edge_same_time : probleme no possible rewirings to finish job ", r, "rewirings done out of ", fin)
-            return randomized_edge_same_time(set(edges), dire, fin-r)
-            #return set(edges)
-        i,j,t = edges[rr]
-        while rr<len(edges)-1 and not check_rewire(d[t],i,j)[0]:
-            rr += 1
-            i,j,t = edges[rr]
-        if not check_rewire(d[t],i,j)[0]:
-            print("randomized_edge_same_time : probleme no possible rewirings to finish job ", r, "rewirings done out of ", fin)
-            return randomized_edge_same_time(set(edges), dire, fin-r)
-            #return set(edges)
-        s = random.randint(0,len(d[t])-1)
-        ip, jp = list(d[t])[s]
+        t = random.sample(possible_t, k = 1, counts = dist)[0]
+        pair = random.sample(ld[t], k = 2)
+        i,j = pair[0]
+        ip, jp = pair[1]
         b = random.randint(0,1)
 #         print("selected", (i,j), (ip,jp), d[t])
         if b == 0 and i!=jp and j!=ip and (i,jp) not in d[t] and (j,ip) not in d[t]:
@@ -863,7 +856,6 @@ def randomized_edge_same_time(g, dire, tout = -1):
             if dire == "u":
                 edges.append( (ip,j,t) )
                 
-            rewired = True
         elif b == 1 and i!=ip and j!=jp and (i,ip) not in d[t] and (j,jp) not in d[t]:
             x = edges.index( (i,j,t) )
             edges.pop(x)
@@ -898,11 +890,7 @@ def randomized_edge_same_time(g, dire, tout = -1):
             edges.append( (j,jp,t) )
             if dire == "u":
                 edges.append( (jp,j,t) )
-            rewired = True
-        if rewired:
-            r += 1
-            rr += 1
-            rewired = False
+        r += 1
     return set(edges)
 
 
