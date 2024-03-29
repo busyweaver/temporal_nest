@@ -814,9 +814,12 @@ def randomized_edge_same_time(g, dire, tout = -1):
     for t in ev:
         ld[t] = list(d[t])
         if len(d[t]) > 1:
-            dist.append(len(d[t])*(len(d[t]) -1)/2 )
+            dist.append(int(len(d[t])*(len(d[t]) -1)/2 ))
             possible_t.append(t)
 #     print("fin", fin)
+    if possible_t == []:
+        print("no possible rewire same time, nothing have been done on the graph")
+        return g
     while r < fin:
         t = random.sample(possible_t, k = 1, counts = dist)[0]
         pair = random.sample(ld[t], k = 2)
@@ -824,7 +827,7 @@ def randomized_edge_same_time(g, dire, tout = -1):
         ip, jp = pair[1]
         b = random.randint(0,1)
 #         print("selected", (i,j), (ip,jp), d[t])
-        if b == 0 and i!=jp and j!=ip and (i,jp) not in d[t] and (j,ip) not in d[t]:
+        if b == 0 and i!=jp and j!=ip and (i,jp) not in ld[t] and (j,ip) not in ld[t]:
             x = edges.index( (i,j,t) )
             edges.pop(x)
             if dire == "u":
@@ -836,18 +839,18 @@ def randomized_edge_same_time(g, dire, tout = -1):
             if dire == "u":
                 x = edges.index( (jp,ip,t) )
                 edges.pop(x)
-            d[t].remove((i,j))
+            ld[t].remove((i,j))
             if dire == "u":
-                d[t].remove((j,i))
-            d[t].remove((ip,jp))
+                ld[t].remove((j,i))
+            ld[t].remove((ip,jp))
             if dire == "u":
-                d[t].remove((jp,ip))
-            d[t].add((i,jp))
+                ld[t].remove((jp,ip))
+            ld[t].append((i,jp))
             if dire == "u":
-                d[t].add((jp,i))
-            d[t].add((j,ip))
+                ld[t].append((jp,i))
+            ld[t].append((j,ip))
             if dire == "u":
-                d[t].add((ip,j))
+                ld[t].append((ip,j))
                 
             edges.append( (i,jp,t) )
             if dire == "u":
@@ -856,7 +859,7 @@ def randomized_edge_same_time(g, dire, tout = -1):
             if dire == "u":
                 edges.append( (ip,j,t) )
                 
-        elif b == 1 and i!=ip and j!=jp and (i,ip) not in d[t] and (j,jp) not in d[t]:
+        elif b == 1 and i!=ip and j!=jp and (i,ip) not in ld[t] and (j,jp) not in ld[t]:
             x = edges.index( (i,j,t) )
             edges.pop(x)
             if dire == "u":
@@ -869,20 +872,20 @@ def randomized_edge_same_time(g, dire, tout = -1):
                 x = edges.index( (jp,ip,t) )
                 edges.pop(x)
                 
-            d[t].remove((i,j))
+            ld[t].remove((i,j))
             if dire == "u":
-                d[t].remove((j,i))
-            d[t].remove((ip,jp))
+                ld[t].remove((j,i))
+            ld[t].remove((ip,jp))
             if dire == "u":
-                d[t].remove((jp,ip))
+                ld[t].remove((jp,ip))
             
-            d[t].add((i,ip))
+            ld[t].append((i,ip))
             if dire == "u":
-                d[t].add((ip,i))
+                ld[t].append((ip,i))
                 
-            d[t].add((j,jp))
+            ld[t].append((j,jp))
             if dire == "u":
-                d[t].add((jp,j))
+                ld[t].append((jp,j))
             edges.append( (i,ip,t) )
             if dire == "u":
                 edges.append( (ip,i,t) )

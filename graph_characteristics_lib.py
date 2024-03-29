@@ -266,7 +266,7 @@ def SI(g, rate,  thresh  = 0.03, horizon = "sr", rate_rec = 0, iterations = math
         lk = rate
     else:
         lk = horizon
-    look_ahead_num = int( lk * m )
+    look_ahead_num = int( lk * (m -t) )
     nei = all_graph_neighbour_node(g, V, l_ev, look_ahead = lk)
     #nei = all_graph_neighbour_imp(g, look_ahead = lk)
     possible_start = []

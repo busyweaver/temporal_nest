@@ -145,24 +145,25 @@ def stats_numberrewirings_conv(path, names, look_aheads, iterations, cut, folder
     #                 print("i",i, "j",j, "keep",len(keep))
     #                 possible_rewire,_ = list_rewirings(g_new,keep[j])
                     keep = read_dic(folder+e[1]+"_"+str(lo)+"_"+str(cut)+"_keep_"+str(i))
+                    tmp = dict()
                     if e[-1] == "u":
                         possible_rewire = rewirings(g_new,keep, e[-1])
                         print("possible", len(possible_rewire))
-                        tmp = dict()
                         for (a,b) in possible_rewire:
                             if a[2] not in tmp:
                                 tmp[a[2]] = 1
                             else:
                                 tmp[a[2]] += 1
+                        nb_possible = len(possible_rewire)
                     else:
                         node_set = nodes(g_new)
                         se = seq_graphs(g_new)
                         ev = events(g_new)
-                        nb_possible, su = nb_felix_flips_improved(ev, se, node_set, keep)
-                        tmp = nb_possible
+                        possible_at, nb_possible = nb_felix_flips_improved(ev, se, node_set, keep)
+                        tmp = possible_at
                         
                     d_time[lo][i] = tmp
-                    d[lo][i] = len(possible_rewire)
+                    d[lo][i] = nb_possible
                     possible_rewire = []
 #                 del keep[0]
                 #save_dic(folder+e[1]+"_"+str(lo)+"_"+str(cut)+"_keep" , keep)
