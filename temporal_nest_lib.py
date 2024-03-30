@@ -421,8 +421,8 @@ def felix_flip_bins(g,se,V,col,t):
             edges.append(e)
     b = False
     while not b:
-        x = random.sample(edges, k = 1, counts = nb_possible_per_edge)[0]
-        e = lse[x]
+        e = random.sample(edges, k = 1, counts = nb_possible_per_edge)[0]
+        #e = lse[x]
         if len(np[col[(e[1],t)]]) > 1:
             b = True
             bb = False
