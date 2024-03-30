@@ -274,24 +274,15 @@ for k in range(len(names)):
         x = max(dd[e].keys())
         if x > m:
             m = x
-        
     for it in range(0,m):
         l = [ dd[e][max(dd[e].keys())] if it not in dd[e] else dd[e][it] for e in look_aheads ]
-#         print(i,j,it)
-#         l = list(dd[it].values())
-#         print(l)
-#             print(look_aheads, l, dd[it])
-#             print(i,j)
-        axs[j, i].plot( look_aheads ,l, alpha=(it+1)/(m+1), color = names[k][2], label= "iter "+str(it+1))
+
+        if i <= 1 and j <= 1:
+            axs[j, i].semilogy( look_aheads ,l, alpha=(it+1)/(m+1), color = names[k][2], label= "iter "+str(it+1))
+        else:
+            axs[j, i].plot( look_aheads ,l, alpha=(it+1)/(m+1), color = names[k][2], label= "iter "+str(it+1))
         axs[j, i].legend()
-#             axs[j, i].plot( [0,1], [0,1],alpha=0.5, color = names[k][2])
-#     if j == 0 and i == 0:
-#         axs[j,i].set(xlabel='', title=names_cut[i],ylabel = cost_type_cut[j][0]+"_"+cost_type_cut[j][1])
-#     elif j == 0 and i != 0:
-#         axs[j,i].set(xlabel='', title=names_cut[i])
-#     elif j!= 0 and i == 0:rewired = False
-#         axs[j,i].set(xlabel='',ylabel = cost_type_cut[j][0]+"_"+cost_type_cut[j][1])
-#     else:
+
     axs[j,i].set(xlabel = "% lookahead" , ylabel='# rewirings', )
 #     axs[j,i].yaxis.set_label_coords(-0.3,0.5)
     axs[j,i].xaxis.set_label_coords(0.5,-0.07)

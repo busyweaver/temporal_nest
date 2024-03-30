@@ -413,9 +413,15 @@ def felix_flip_bins(g,se,V,col,t):
     np = node_partition(V, t, col)
     ep = edge_partition(se[t],t, col)
     lse = list(se[t])
+    nb_possible_per_edge = []
+    edges = []
+    for e in lse:
+        if len(np[col[(e[1],t)]]) > 1:
+            nb_possible_per_edge.append( len(np[col[(e[1],t)]]) )
+            edges.append(e)
     b = False
     while not b:
-        x = random.randint(0, len(se[t])-1)
+        x = random.sample(edges, k = 1, counts = nb_possible_per_edge)[0]
         e = lse[x]
         if len(np[col[(e[1],t)]]) > 1:
             b = True
