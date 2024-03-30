@@ -7,6 +7,7 @@
 from graph_characteristics_lib import *
 import os
 import sys
+import math
 
 path = "datasets/networks/"
 names = [ ["opsahl", "opsahl", "black","d"], ["email-eu2", "eu2", "magenta","d"], ["dnc", "dnc", "brown","d"], ["email-eu3", "eu3", "yellow","d"], ["highschool_2011", "hs11", "purple","u"], ["hospital_ward", "hw", "blue","u"], ["ht09", "ht","red","u"], ["workplace_2013", "wp", "green","u"] ]
@@ -500,7 +501,8 @@ def statistics_rewirings_clus(path,names,cut,nb_rewire,folder, folder_res, iter_
             col = read_dic(names_keep+"_"+str(1))
             nb = 1
             if nb != 0:
-                x,y,z = randomize(g_new,nb_rewire,col,names[k][-1])
+                m = len(g_new)
+                x,y,z = randomize(g_new,nb_rewire*m*math.log(m),col,names[k][-1])
                 fg.write(names[k][1])
                 for e in [g_new,x,y,z]:
                     fg.write(" & $ "+str(float(average_clustering_network_imp(e)))[:5]+" $,")
@@ -536,6 +538,6 @@ def statistics_rewirings_clus(path,names,cut,nb_rewire,folder, folder_res, iter_
 # In[4]:
 
 
-nb_rewire = 20000
+nb_rewire = 2
 nb_pandemy = 1
 statistics_rewirings_clus(path,names,cut,nb_rewire, folder, folder_res, nb_pandemy)
