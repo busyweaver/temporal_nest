@@ -603,7 +603,7 @@ def check_rewire_all(g,rewire):
                 return False
     return True
 
-def rewiring_one(g_new, rewire, se, dire):
+def rewiring_one(g_new, rewire, se, bern, dire):
     #print("rewiring_one")
 #     check_seq_g(g_new,se)
 #     check_rewire_all(g_new,rewire)
@@ -612,8 +612,7 @@ def rewiring_one(g_new, rewire, se, dire):
         su += len(rewire[t])
 
     #allow self loop in markov chain
-    esq = len(g_new)*len(g_new)
-    x = random.randint(0,esq-1)
+    x = random.randint(0,bern-1)
     if x >= su:
         g_new, se, -1, -1
 
@@ -655,11 +654,9 @@ def rewiring_one(g_new, rewire, se, dire):
         g_new.add((c,b,tp))
         if dire=="u":
             g_new.add((b,c,tp))
-        
         se[tp].add((c,b))
         if dire=="u":
             se[tp].add((b,c))
-            
         r = t
     return g_new,se,r,tp
 
@@ -671,13 +668,15 @@ def rewire_any(gg,n,col,dire):
     ev = events(g)
     index = []
     l = []
+    bern = 0
     for t in ev:
         index.append(t)
         rewire[t] = list(rewirings_at_time(se,col,t))
         l = l+rewire[t]
+        bern += len(se[t])*len(se[t])
     for i in range(n):
 #         print("i",i)
-        g,se,t,tp = rewiring_one(g,rewire,se,dire)
+        g,se,t,tp = rewiring_one(g,rewire,se,bern,dire)
         if t != -1:
             rewire[t] = list(rewirings_at_time(se,col,t))
             if t != tp:
