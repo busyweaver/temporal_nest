@@ -502,7 +502,7 @@ def statistics_rewirings_clus(path,names,cut,nb_rewire,folder, folder_res, iter_
             nb = 1
             if nb != 0:
                 m = len(g_new)
-                x,y,z = randomize(g_new,nb_rewire*m*math.log(m),col,names[k][-1])
+                x,y,z = randomize(g_new,int(nb_rewire*m*math.log(m)),col,names[k][-1])
                 fg.write(names[k][1])
                 for e in [g_new,x,y,z]:
                     fg.write(" & $ "+str(float(average_clustering_network_imp(e)))[:5]+" $,")
