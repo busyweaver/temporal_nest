@@ -498,6 +498,12 @@ def statistics_rewirings_clus(path,names,cut,nb_rewire,folder, folder_res, iter_
                 for e in [g_new,x,y,z]:
                     fg.write(" & $ "+str(float(average_clustering_network_imp(e)))[:5]+" $,")
                     print("clust ok")
+                for e in [g_new,x,y,z]:
+                    fg.write(" & $ "+str(float(global_efficiency_imp(e,"s",approx)[0]))[:5]+" $ ,")
+                    print("effi shor ok")
+                for e in [g_new,x,y,z]:
+                    fg.write(" & $ "+str(float(global_efficiency_imp(e,"d",approx)[0]))[:5]+" $ ,")
+                    print("effi dur ok")
                 fg.write("\\\\ \n")
 
                 # DIFFUSIONS
