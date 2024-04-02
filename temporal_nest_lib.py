@@ -591,7 +591,6 @@ def check_seq_g(g,se):
             print("check : PROBLEM in g not se")
             return False
     return True
-            
 def check_rewire_all(g,rewire):
     for t in rewire.keys():
         for e in rewire[t]:
