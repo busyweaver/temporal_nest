@@ -265,7 +265,6 @@ def check_convergence_node_labels(new,old):
         set_old = y[col_old]
 #         print(set_new,set_old)
         if not set_new == set_old:
-            print(set_new,set_old)
             return False
     return True
 
