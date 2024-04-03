@@ -206,6 +206,11 @@ def graph_cut(g, dire, tau):
     g_new = lgo[:val]
     if dire == "u":
         g_new = to_undirected(g_new)
+        lg = list(g_new)
+        lgo = [ [e[2],e] for e in lg ]
+        lgo.sort()
+        lgo = [ e[1] for e in lgo ]
+        g_new = lgo
     return g_new
 
 
@@ -260,6 +265,7 @@ def check_convergence_node_labels(new,old):
         set_old = y[col_old]
 #         print(set_new,set_old)
         if not set_new == set_old:
+            print(set_new,set_old)
             return False
     return True
 
@@ -294,12 +300,11 @@ def weisfeiler_lehman_graph_hash(
     if save_each_step:
         save_dic(name_save+"_"+str(1) , node_labels)
     if keep_iterations:
-        keep[1] = node_labels        
+        keep[1] = node_labels
 
     #print("end firt save")
     subgraph_hash_counts = []
-    i = -1
-    for i in range(1,iterations +1):
+    for i in range(2,iterations +1):
         print("iteration", i)
         node_labels_new = weisfeiler_lehman_step(G, nei, node_labels, nod, l_ev, reverse, look_ahead)
         counter = Counter(node_labels_new.values())
@@ -310,15 +315,15 @@ def weisfeiler_lehman_graph_hash(
             break
         else:
             if keep_iterations:
-                keep[i+1] = node_labels
+                keep[i] = node_labels_new
             if save_each_step:
-                save_dic(name_save+"_"+str(i+1) , node_labels)
+                save_dic(name_save+"_"+str(i) , node_labels_new)
             node_labels = node_labels_new
 
     # hash the final counter
 #     if keep_iterations:
 #         keep.append(node_labels_new)
-    return _hash_label(str(tuple(subgraph_hash_counts)), digest_size), node_labels, keep, i+1
+    return _hash_label(str(tuple(subgraph_hash_counts)), digest_size), node_labels, keep, i-1
 
 # works only for directed
 

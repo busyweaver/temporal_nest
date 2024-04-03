@@ -86,7 +86,6 @@ def global_efficiency_imp(g,p):
                         diameter = dvw
     N = len(V)
     return  su, diameter
-    
 
 def topological_overlap(g,i,t,ev,se,V):
     m = ev.index(t)

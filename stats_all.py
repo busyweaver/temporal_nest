@@ -31,6 +31,8 @@ def read_graph(path,s, dire):
     g = set()
     f = open(path+s+".csv", "r")
     sep = find_sep(f.readline())
+    f.close()
+    f = open(path+s+".csv", "r")
     for x in f:
         x = x[:-1]
         r = x.split(sep)
