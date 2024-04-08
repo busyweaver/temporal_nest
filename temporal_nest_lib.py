@@ -699,6 +699,35 @@ def nb_randomized_edge(g):
                 nb += 1
     return nb
     
+
+def randomized_edge_gen(g, dire, tout = -1):
+    if dire == 'u':
+        return randomized_edge(g, dire, tout)
+    else:
+        return randomized_edge_directed(g, dire, tout)
+
+
+def randomized_edge_directed(gg, dire, tout = -1):
+    g = set(gg.copy())
+    se = seq_graphs(g)
+    node_set = nodes(g)
+    ev = events(g)
+    nb_possible =  {t: len(se[t])*len(node_set) for t in ev }
+    su = sum(nb_possible.values())
+    col = { (v,t):'1' for v in node_set for t in ev }
+    if su == 0:
+        print("no possible flips")
+        return -1
+    for _ in range(tout):
+        x = random.randint(0,su-1)
+        for t in ev:
+            x = x-nb_possible[t]
+            if x < 0:
+                break
+        g,se = felix_flip_bins(g,se,node_set,col,t)
+    return list(g)
+
+
     
 def randomized_edge(g, dire, tout = -1):
     edges = list(g)
@@ -806,6 +835,19 @@ def number_rewirings_randomized_same_time(g):
             if x[0]:
                 nb += x[1]
     return nb
+
+def randomized_edge_same_time_gen(g, dire, tout = -1):
+    if dire == 'u':
+        return randomized_edge_same_time(g, dire, tout)
+    else:
+        return randomized_edge_same_time_directed(g, dire, tout)
+
+
+def randomized_edge_same_time_directed(g, dire, tout = -1):
+    V = nodes(g)
+    T = events(g)
+    return felix_flips_imp(g,tout, { (v,t):'1' for v in V for t in T } )
+
 
 def randomized_edge_same_time(g, dire, tout = -1):
     edges = list(g)
@@ -1039,9 +1081,9 @@ def randomize(g,n,col,dire):
         g1 = felix_flips_imp(g,n,col)
         #g1 = felix_flips(g,n,col)
     print("fin g1")
-    g2 = randomized_edge_same_time(g,dire, n)
+    g2 = randomized_edge_same_time_gen(g,dire, n)
     print("fin g2")
-    g3 = randomized_edge(g,dire,n)
+    g3 = randomized_edge_gen(g,dire,n)
     print("fin g3")
     return g1, g2, g3
 
