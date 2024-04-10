@@ -709,24 +709,21 @@ def randomized_edge_gen(g, dire, tout = -1):
 
 def randomized_edge_directed(gg, dire, tout = -1):
     g = set(gg.copy())
-    se = seq_graphs(g)
+    #se = seq_graphs(g)
     node_set = nodes(g)
+    lv = list(node_set)
     ev = events(g)
-    nb_possible =  {t: len(se[t])*len(node_set) for t in ev }
-    su = sum(nb_possible.values())
-    col = { (v,t):'1' for v in node_set for t in ev }
-    if su == 0:
-        print("no possible flips")
-        return -1
+    lev = list(ev)
+    lg = list(g)
     for _ in range(tout):
-        x = random.randint(0,su-1)
-        for t in ev:
-            x = x-nb_possible[t]
-            if x < 0:
-                break
-        g,se = felix_flip_bins(g,se,node_set,col,t)
-    return list(g)
-
+        i = random.randint(0,len(lg)-1)
+        u,v,t = lg[i]
+        w = random.choice(lv)
+        tp = random.choice(lev)
+        if w!=v:
+            lg.pop(i)
+            lg.append((u,w,tp))
+    return lg
 
     
 def randomized_edge(g, dire, tout = -1):

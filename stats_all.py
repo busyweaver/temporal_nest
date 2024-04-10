@@ -490,8 +490,8 @@ def statistics_rewirings_clus(path,names,cut,nb_rewire,folder, folder_res, iter_
             names_keep = folder+names[k][1]+"_"+str(1)+"_"+str(cut)+"_keep"
             max_wl = find_max_wl(folder, names_keep)
             # if want max iteration do this
-            #col = read_dic(names_keep+"_"+str(max_wl))
-            col = read_dic(names_keep+"_"+str(1))
+            col = read_dic(names_keep+"_"+str(max_wl))
+            #col = read_dic(names_keep+"_"+str(1))
             nb = 1
             if nb != 0:
                 m = len(g_new)
@@ -537,6 +537,6 @@ def statistics_rewirings_clus(path,names,cut,nb_rewire,folder, folder_res, iter_
 # In[4]:
 
 
-nb_rewire = 2
+nb_rewire = 5
 nb_pandemy = 1
 statistics_rewirings_clus(path,names,cut,nb_rewire, folder, folder_res, nb_pandemy)
