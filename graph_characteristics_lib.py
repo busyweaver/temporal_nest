@@ -48,11 +48,10 @@ def global_efficiency(g,p,approx = 1):
                 #print("cur_best[w]",w,cur_best[w])
                 dvw = min(cur_best[w].values())
                 #print("v", v, "w", w, "dvw", dvw)
-                if dvw != 0:
-                    if p == "d":
-                        su += (1/(dvw+1))
-                    else:
-                        su += (1/dvw)
+                if p == "d":
+                    su += (1/(dvw+1))
+                else:
+                    su += (1/dvw)
                 if dvw != numpy.Infinity:
                     if dvw > diameter:
                         diameter = dvw
