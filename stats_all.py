@@ -506,9 +506,9 @@ def statistics_rewirings_clus(path,names,cut,nb_rewire,folder, folder_res, iter_
                     for ii in range(3):
                         clus[ii].append(float(average_clustering_network_imp(ll[ii])))
                         print("clust ok")
-                        eff_s[ii].append(float(global_efficiency_imp(ll[ii],"s")[0]))
+                        eff_s[ii].append(float(global_efficiency_cpp(ll[ii],"s")[0]))
                         print("effi shor ok")
-                        eff_d[ii].append(float(global_efficiency_imp(ll[ii],"d")[0]))
+                        eff_d[ii].append(float(global_efficiency_cpp(ll[ii],"d")[0]))
                         print("effi dur ok")
 
                 av_clus = [ sum(clus[ii])/nb_graphs  for ii in range(3)]
@@ -524,9 +524,9 @@ def statistics_rewirings_clus(path,names,cut,nb_rewire,folder, folder_res, iter_
 
                 av_clus = [float(average_clustering_network_imp(g_new))] + av_clus
                 print("clus orig ok")
-                av_eff_s = [float(global_efficiency_imp(g_new,"s")[0])] + av_eff_s
+                av_eff_s = [float(global_efficiency_cpp(g_new,"s")[0])] + av_eff_s
                 print("eff shor orig ok")
-                av_eff_d = [float(global_efficiency_imp(g_new,"d")[0])] + av_eff_d
+                av_eff_d = [float(global_efficiency_cpp(g_new,"d")[0])] + av_eff_d
                 print("eff dur orig ok")
 
                 fg.write(names[k][1])
