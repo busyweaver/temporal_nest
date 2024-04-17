@@ -9,6 +9,8 @@ import straph.betweenness.optimal_paths as opt
 import random
 import numpy
 import fibheap as fib
+import subprocess
+
 #max of a set with positive values
 def max_not_inf(s):
     m = -1
@@ -16,6 +18,7 @@ def max_not_inf(s):
         if e > m and e != numpy.Infinity:
             m = e
     return m
+
 
 def global_efficiency(g,p,approx = 1):
     diameter = -1
@@ -30,15 +33,19 @@ def global_efficiency(g,p,approx = 1):
     S = sg.read_stream_graph(path_nodes="tmp_nodes.sg",
                           path_links="tmp_links.sg")
     lS = list(S.nodes)
+    #print("ids", S.node_to_label)
+    #print("node", S.nodes, "edges", S.links, "presence", S.link_presence)
     event, event_reverse = bt.events_dic(S)
     link_ind = bt.link_index(S)
     neighbors, neighbors_inv = bt.neighbors_direct(S)
+    #print("neigbour", neighbors)
     sam = random.sample(lS, k = int(approx*len(lS)))
     for v in sam:
         _, cur_best, _ = bt.dijkstra_directed_dis_gen(S, v, event, event_reverse, neighbors, neighbors_inv, link_ind, b, fun, walk_type)
 #         _, cur_besttmp, _ = bt.dijkstra_directed_dis_gen(S, v, event, event_reverse, neighbors, neighbors_inv, link_ind, b, fun2, walk_type)
         for w in S.nodes:
             if v!=w:
+                #print("cur_best[w]",w,cur_best[w])
                 dvw = min(cur_best[w].values())
                 #print("v", v, "w", w, "dvw", dvw)
                 if dvw != 0:
@@ -49,14 +56,55 @@ def global_efficiency(g,p,approx = 1):
                 if dvw != numpy.Infinity:
                     if dvw > diameter:
                         diameter = dvw
-    N = len(sam)
-    #print("N", N)
-    #if want to renormalize
-    if N > 1:
-        return  (1/(N*(N-1)))*su, diameter
-    else:
-        return  su, diameter
-    #return su, diameter
+    return  su, diameter
+
+def read_file_cpp(filename):
+    result_dict = {}
+    with open(filename, 'r') as file:
+        for line_number, line in enumerate(file, start=0):
+            try:
+                value = int(line.strip())
+                if value != 2147483647:
+                    result_dict[line_number] = value
+                else:
+                    result_dict[line_number] = numpy.Infinity
+            except ValueError:
+                print(f"Skipping line {line_number}: '{line.strip()}' is not a valid integer.")
+    return result_dict
+
+def global_efficiency_cpp(g,p):
+    V = nodes(g)
+    ev = list(events(g))
+    ev.sort()
+    se = seq_graphs(g)
+    diameter = -1
+    su = 0
+    d = to_himmel(g,"tmp")
+    d_rev = { d[v]:v   for v in d.keys()   }
+    for v in V:
+        if p == "d":
+            subprocess.run(["./implementation/tempath", "-e", "tmp.csv", "-s", str(d[v]), "-a", "fastest"])
+        else:
+            subprocess.run(["./implementation/tempath", "-e", "tmp.csv", "-s", str(d[v]), "-a", "hopcount"])
+
+        cur_tmp = read_file_cpp("pipe_cpp_python")
+        cur_best = { d_rev[i]:cur_tmp[i] for i in cur_tmp.keys()    }
+        #print(cur_tmp)
+        #print(cur_best)
+        for w in V:
+            if v!=w:
+                dvw = cur_best[w]
+                #print("v", v, "w", w, "dvw", dvw)
+                if p == "d":
+                    su += (1/(dvw+1))
+                else:
+                    su += (1/dvw)
+                if dvw != numpy.Infinity:
+                    if dvw > diameter:
+                        diameter = dvw
+    subprocess.run(["rm", "pipe_cpp_python"])
+    subprocess.run(["rm", "tmp.csv"])
+    return  su, diameter
 
 def global_efficiency_imp(g,p):
     V = nodes(g)
@@ -76,15 +124,13 @@ def global_efficiency_imp(g,p):
             if v!=w:
                 dvw = cur_best[w]
                 #print("v", v, "w", w, "dvw", dvw)
-                if dvw != 0:
-                    if p == "d":
-                        su += (1/(dvw+1))
-                    else:
-                        su += (1/dvw)
+                if p == "d":
+                    su += (1/(dvw+1))
+                else:
+                    su += (1/dvw)
                 if dvw != numpy.Infinity:
                     if dvw > diameter:
                         diameter = dvw
-    N = len(V)
     return  su, diameter
 
 def topological_overlap(g,i,t,ev,se,V):

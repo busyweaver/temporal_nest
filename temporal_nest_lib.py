@@ -403,7 +403,6 @@ def nb_possible_felix(col, V, t, se):
     # print("indeg", indeg)
     nb = 0
     for e in ep.keys():
-
         if e[0] == e[1]:
             #nb += (len(np[e[1]]) - 1)*len(ep[e]) - sum(   indeg[v][e[0]] for (u,v) in ep[e] )
             nb += (len(np[e[1]]) - 1)*len(ep[e]) - sum(   indeg[v][e[0]] if e[0] in indeg[v] and col[(v,t)]==e[1] else 0 for v in indeg.keys() )
@@ -463,6 +462,8 @@ def felix_flips_imp(gg,n,col):
     if su == 0:
         print("no possible flips")
         return -1
+    else:
+        print("total possible felix flips directed", su)
     for _ in range(n):
         x = random.randint(0,su-1)
         for t in ev:
@@ -490,7 +491,6 @@ def felix_flips(gg,n,col):
 #         flips.add((x[1],x[0]))
     return list(g)
 
-                
 
 def list_rewirings(g,col):
     res = []
@@ -1049,8 +1049,27 @@ def to_straph_file(g,s):
             f.write(v+" "+str(mi)+" "+str(ma)+"\n")
     with open(s+"_links.sg","w") as f:
         for u,v in tmp.keys():
+            f.write(u+" "+v+" ")
             for t in tmp[(u,v)]:
-                f.write(u+" "+v+" "+str(t)+" "+str(t)+"\n")
+                f.write(str(t)+" "+str(t)+ " ")
+            f.write("\n")
+
+def to_himmel(g,s):
+    no = nodes(g)
+    d = dict()
+    i = 0
+    for v in no:
+        d[v] = i
+        i += 1
+    with open(s+".csv","w") as f:
+        lg = list(g)
+        lgt = [  (e[2],e[0],e[1]) for e in lg ]
+        lgt.sort()
+        g = [  (e[1],e[2],e[0])  for e in lgt]
+        f.write(str(len(no))+" "+str(len(g))+" "+str(0)+"\n")
+        for e in g:
+            f.write(str(d[e[0]])+" "+str(d[e[1]])+" "+str(e[2])+" 1\n")
+    return d
 #for static graphs
 def adj(g):
     tmp = dict()

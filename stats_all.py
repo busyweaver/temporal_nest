@@ -16,9 +16,11 @@ iterations = 1
 cut = float(sys.argv[1])
 print("cut", cut)
 if len(sys.argv) <= 2:
-    approx = 1
+    nb_graphs = 1
 else:
-    approx = float(sys.argv[2])
+    nb_graphs = int(sys.argv[2])
+
+print("average nb graphs", nb_graphs)
 
 def find_sep(x):
     for s in x:
@@ -414,61 +416,61 @@ fig.show()
 # In[2]:
 
 
-def statistics_rewirings(path,names,cut,nb_rewire, iter_pandemy, folder, folder_res, approx, wl_it = -1,look_ahead = 1):
-    print("stats rewirings")
-    files = [f for f in os.listdir(folder_res) if os.path.isfile(folder_res+f)]
-    s = "table_charac.tex"
-    s2 = "table_diff_"+str(iter_pandemy)+".tex"
-    if s not in files:
-        fg = open(folder_res+s, "w")
-        fg2 = open(folder_res+s2, "w")
-        for k in range(0,len(names)):
-            print("statistics_rewirings",  names[k][0])
-            g = read_graph(path,names[k][0], names[k][-1])
-            g_new = graph_cut(g,names[k][-1], cut)
-            m = max(events(g_new))
-            names_keep = folder+names[k][1]+"_"+str(1)+"_"+str(cut)+"_keep"
-            max_wl = find_max_wl(folder, names_keep)
-            # if want max iteration do this
-            # col = read_dic(names_keep+"_"+str(max_wl))
-            col = read_dic(names_keep+"_"+str(1))
-            nb = 1
-            if nb != 0:
-                x,y,z = randomize(g_new,nb_rewire,col,names[k][-1])
-                fg.write(names[k][1])
-                for e in [g_new,x,y,z]:
-                    fg.write(" & $ "+str(float(average_clustering_network2(e,approx)))[:5]+" $,")
-                    print("clust ok")
-                for e in [g_new,x,y,z]:
-                    fg.write(" & $ "+str(float(global_efficiency(e,"s",approx)[0]))[:5]+" $ ,")
-                    print("effi shor ok")
-                for e in [g_new,x,y,z]:
-                    fg.write(" & $ "+str(float(global_efficiency(e,"d",approx)[0]))[:5]+" $ ,")
-                    print("effi dur ok")
-                fg.write("\\\\ \n")
+# def statistics_rewirings(path,names,cut,nb_rewire, iter_pandemy, folder, folder_res, approx, wl_it = -1,look_ahead = 1):
+#     print("stats rewirings")
+#     files = [f for f in os.listdir(folder_res) if os.path.isfile(folder_res+f)]
+#     s = "table_charac.tex"
+#     s2 = "table_diff_"+str(iter_pandemy)+".tex"
+#     if s not in files:
+#         fg = open(folder_res+s, "w")
+#         fg2 = open(folder_res+s2, "w")
+#         for k in range(0,len(names)):
+#             print("statistics_rewirings",  names[k][0])
+#             g = read_graph(path,names[k][0], names[k][-1])
+#             g_new = graph_cut(g,names[k][-1], cut)
+#             m = max(events(g_new))
+#             names_keep = folder+names[k][1]+"_"+str(1)+"_"+str(cut)+"_keep"
+#             max_wl = find_max_wl(folder, names_keep)
+#             # if want max iteration do this
+#             # col = read_dic(names_keep+"_"+str(max_wl))
+#             col = read_dic(names_keep+"_"+str(1))
+#             nb = 1
+#             if nb != 0:
+#                 x,y,z = randomize(g_new,nb_rewire,col,names[k][-1])
+#                 fg.write(names[k][1])
+#                 for e in [g_new,x,y,z]:
+#                     fg.write(" & $ "+str(float(average_clustering_network2(e,approx)))[:5]+" $,")
+#                     print("clust ok")
+#                 for e in [g_new,x,y,z]:
+#                     fg.write(" & $ "+str(float(global_efficiency(e,"s",approx)[0]))[:5]+" $ ,")
+#                     print("effi shor ok")
+#                 for e in [g_new,x,y,z]:
+#                     fg.write(" & $ "+str(float(global_efficiency(e,"d",approx)[0]))[:5]+" $ ,")
+#                     print("effi dur ok")
+#                 fg.write("\\\\ \n")
 
-                # DIFFUSIONS
-                l = [g_new,x,y,z]
-                rates = [0.1,0.2,0.3]
-                average = dict( { e:dict(  {ee : 0 for ee in range(len(l)) } )  for e in rates }  )
-                pan = 0
-                while pan < iter_pandemy:
-                    print("pan", pan)
-                    for rate in rates:
-                        for i in range(len(l)):
-                            r = SI(l[i], rate, iterations = 100)
-                            average[rate][i] += (r[1]/iter_pandemy)
-                    pan += 1
-                fg2.write(names[k][1]+" ")
-                for rate in rates:
-                    for i in range(len(l)):
-                        fg2.write("$ "+str(float(average[rate][i]))[:5]+" $ ")
-                fg2.write("\\\\ \n")
+#                 # DIFFUSIONS
+#                 l = [g_new,x,y,z]
+#                 rates = [0.1,0.2,0.3]
+#                 average = dict( { e:dict(  {ee : 0 for ee in range(len(l)) } )  for e in rates }  )
+#                 pan = 0
+#                 while pan < iter_pandemy:
+#                     print("pan", pan)
+#                     for rate in rates:
+#                         for i in range(len(l)):
+#                             r = SI(l[i], rate, iterations = 100)
+#                             average[rate][i] += (r[1]/iter_pandemy)
+#                     pan += 1
+#                 fg2.write(names[k][1]+" ")
+#                 for rate in rates:
+#                     for i in range(len(l)):
+#                         fg2.write("$ "+str(float(average[rate][i]))[:5]+" $ ")
+#                 fg2.write("\\\\ \n")
 
-        fg.close()
-        fg2.close()
-    else:
-        print("file statistics_rewirings already present")
+#         fg.close()
+#         fg2.close()
+#     else:
+#         print("file statistics_rewirings already present")
 
 
 # In[3]:
@@ -495,16 +497,55 @@ def statistics_rewirings_clus(path,names,cut,nb_rewire,folder, folder_res, iter_
             nb = 1
             if nb != 0:
                 m = len(g_new)
-                x,y,z = randomize(g_new,int(nb_rewire*m*math.log(m)),col,names[k][-1])
+                clus = [[],[],[]]
+                eff_s = [[],[],[]]
+                eff_d = [[],[],[]]
+                for z in range(nb_graphs):
+                    print("randomize iteration number ", z+1)
+                    ll = randomize(g_new,int(nb_rewire*m*math.log(m)),col,names[k][-1])
+                    for ii in range(3):
+                        clus[ii].append(float(average_clustering_network_imp(ll[ii])))
+                        print("clust ok")
+                        eff_s[ii].append(float(global_efficiency_imp(ll[ii],"s")[0]))
+                        print("effi shor ok")
+                        eff_d[ii].append(float(global_efficiency_imp(ll[ii],"d")[0]))
+                        print("effi dur ok")
+
+                av_clus = [ sum(clus[ii])/nb_graphs  for ii in range(3)]
+                av_eff_s = [ sum(eff_s[ii])/nb_graphs  for ii in range(3)]
+                av_eff_d = [ sum(eff_d[ii])/nb_graphs  for ii in range(3)]
+
+                dev_clus = [ math.sqrt(sum( (clus[ii][jj]-av_clus[ii])**2 for jj in range(len(clus[ii]))  )/(nb_graphs - 1))  for ii in range(3)]
+                dev_clus = [0] + dev_clus
+                dev_eff_s = [ math.sqrt(sum( (eff_s[ii][jj]-av_eff_s[ii])**2 for jj in range(len(eff_s[ii]))  )/(nb_graphs - 1))  for ii in range(3)]
+                dev_eff_s = [0] + dev_eff_s
+                dev_eff_d = [ math.sqrt(sum( (eff_d[ii][jj]-av_eff_d[ii])**2 for jj in range(len(eff_d[ii]))  )/(nb_graphs - 1))  for ii in range(3)]
+                dev_eff_d = [0] + dev_eff_d
+
+                av_clus = [float(average_clustering_network_imp(g_new))] + av_clus
+                print("clus orig ok")
+                av_eff_s = [float(global_efficiency_imp(g_new,"s")[0])] + av_eff_s
+                print("eff shor orig ok")
+                av_eff_d = [float(global_efficiency_imp(g_new,"d")[0])] + av_eff_d
+                print("eff dur orig ok")
+
                 fg.write(names[k][1])
-                for e in [g_new,x,y,z]:
-                    fg.write(" & $ "+str(float(average_clustering_network_imp(e)))[:5]+" $,")
+                for e in range(4):
+                    fg.write(" & $ "+str(av_clus[e])[:5]+" $,")
+                for e in range(4):
+                    fg.write(" & $ "+str(av_eff_s[e])[:5]+" $ ,")
+                for e in range(4):
+                    fg.write(" & $ "+str(av_eff_d[e])[:5]+" $ ,")
+                fg.write("\\\\ \n")
+
+                for e in range(4):
+                    fg.write(" & $ "+str(dev_clus[e])[:5]+" $,")
                     print("clust ok")
-                for e in [g_new,x,y,z]:
-                    fg.write(" & $ "+str(float(global_efficiency_imp(e,"s")[0]))[:5]+" $ ,")
+                for e in range(4):
+                    fg.write(" & $ "+str(dev_eff_s[e])[:5]+" $ ,")
                     print("effi shor ok")
-                for e in [g_new,x,y,z]:
-                    fg.write(" & $ "+str(float(global_efficiency_imp(e,"d")[0]))[:5]+" $ ,")
+                for e in range(4):
+                    fg.write(" & $ "+str(dev_eff_d[e])[:5]+" $ ,")
                     print("effi dur ok")
                 fg.write("\\\\ \n")
 
