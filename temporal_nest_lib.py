@@ -458,7 +458,11 @@ def felix_flips_imp(gg,n,col):
     se = seq_graphs(g)
     node_set = nodes(g)
     ev = events(g)
+    lev = list(ev)
     nb_possible, su = nb_felix_flips_improved(ev, se, node_set, col)
+    partial_sum = [nb_possible[lev[0]]]
+    for i in range(1,len(lev)):
+        partial_sum.append( partial_sum[i-1]+nb_possible[lev[i]]  )
     if su == 0:
         print("no possible flips")
         return -1
@@ -466,10 +470,22 @@ def felix_flips_imp(gg,n,col):
         print("total possible felix flips directed", su)
     for _ in range(n):
         x = random.randint(0,su-1)
-        for t in ev:
-            x = x-nb_possible[t]
-            if x < 0:
-                break
+        d = 0
+        f = len(lev) - 1
+        while f > d:
+            i = d + (f-d)//2
+            if x < partial_sum[i]:
+                #print("cas 1")
+                f = i
+            else:
+                #print("cas 2")
+                d = i+1
+        #normally d = f
+        t = lev[d]
+        # for t in ev:
+        #     x = x-nb_possible[t]
+        #     if x < 0:
+        #         break
         g,se = felix_flip_bins(g,se,node_set,col,t)
     return list(g)
 

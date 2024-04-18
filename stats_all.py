@@ -515,12 +515,21 @@ def statistics_rewirings_clus(path,names,cut,nb_rewire,folder, folder_res, iter_
                 av_eff_s = [ sum(eff_s[ii])/nb_graphs  for ii in range(3)]
                 av_eff_d = [ sum(eff_d[ii])/nb_graphs  for ii in range(3)]
 
-                dev_clus = [ math.sqrt(sum( (clus[ii][jj]-av_clus[ii])**2 for jj in range(len(clus[ii]))  )/(nb_graphs - 1))  for ii in range(3)]
-                dev_clus = [0] + dev_clus
-                dev_eff_s = [ math.sqrt(sum( (eff_s[ii][jj]-av_eff_s[ii])**2 for jj in range(len(eff_s[ii]))  )/(nb_graphs - 1))  for ii in range(3)]
-                dev_eff_s = [0] + dev_eff_s
-                dev_eff_d = [ math.sqrt(sum( (eff_d[ii][jj]-av_eff_d[ii])**2 for jj in range(len(eff_d[ii]))  )/(nb_graphs - 1))  for ii in range(3)]
-                dev_eff_d = [0] + dev_eff_d
+                if nb_graphs > 1:
+                    dev_clus = [ math.sqrt(sum( (clus[ii][jj]-av_clus[ii])**2 for jj in range(len(clus[ii]))  )/(nb_graphs - 1))  for ii in range(3)]
+                    dev_clus = [0] + dev_clus
+                    dev_eff_s = [ math.sqrt(sum( (eff_s[ii][jj]-av_eff_s[ii])**2 for jj in range(len(eff_s[ii]))  )/(nb_graphs - 1))  for ii in range(3)]
+                    dev_eff_s = [0] + dev_eff_s
+                    dev_eff_d = [ math.sqrt(sum( (eff_d[ii][jj]-av_eff_d[ii])**2 for jj in range(len(eff_d[ii]))  )/(nb_graphs - 1))  for ii in range(3)]
+                    dev_eff_d = [0] + dev_eff_d
+                else:
+                    dev_clus = [ 0  for ii in range(3)]
+                    dev_clus = [0] + dev_clus
+                    dev_eff_s = [ 0 for ii in range(3)]
+                    dev_eff_s = [0] + dev_eff_s
+                    dev_eff_d = [ 0  for ii in range(3)]
+                    dev_eff_d = [0] + dev_eff_d
+
 
                 av_clus = [float(average_clustering_network_imp(g_new))] + av_clus
                 print("clus orig ok")
