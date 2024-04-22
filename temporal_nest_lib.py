@@ -622,13 +622,10 @@ def check_rewire_all(g,rewire):
                 return False
     return True
 
-def rewiring_one(g_new, rewire, se, bern, dire):
+def rewiring_one(g_new, rewire, se, bern, su, lev, dire):
     #print("rewiring_one")
 #     check_seq_g(g_new,se)
 #     check_rewire_all(g_new,rewire)
-    su = 0
-    for t in rewire.keys():
-        su += len(rewire[t])
 
     #allow self loop in markov chain
     x = random.randint(0,bern-1)
@@ -639,14 +636,16 @@ def rewiring_one(g_new, rewire, se, bern, dire):
 #     m = max(events(g))
     r = -1
     tp = -1
+    nb_rew = -1
     if su != 0:
         i = random.randint(0,su-1)
-        lk = list(rewire.keys())
-        for j in range(len(lk)):
-            i = i - len(rewire[lk[j]])
+        for j in range(len(lev)):
+            i = i - len(rewire[lev[j]])
             if i < 0:
                 break
-        (a,b,t),(c,d,tp) = rewire[lk[j]][i]
+        (a,b,t),(c,d,tp) = rewire[lev[j]][i]
+        nb_rew = len(rewire[lev[j]])
+        #print("rew", (a,b,t),(c,d,tp))
 
         g_new.remove((a,b,t))
         if dire=="u":
@@ -677,7 +676,7 @@ def rewiring_one(g_new, rewire, se, bern, dire):
         if dire=="u":
             se[tp].add((b,c))
         r = t
-    return g_new,se,r,tp
+    return g_new,se,r,tp,nb_rew
 
 def rewire_any(gg,n,col,dire):
     g = set(gg.copy())
@@ -685,20 +684,25 @@ def rewire_any(gg,n,col,dire):
     rewire = dict()
     se = seq_graphs(g)
     ev = events(g)
-    index = []
-    l = []
+    lev = list(ev)
+    lev.sort(reverse = True)
+    #l = []
     bern = 0
-    for t in ev:
-        index.append(t)
-        rewire[t] = list(rewirings_at_time(se,col,t))
-        l = l+rewire[t]
-        bern += len(se[t])*len(se[t])
+    su = 0
+    for i in range(len(lev)):
+        rewire[lev[i]] = list(rewirings_at_time(se,col,lev[i]))
+        #l = l+rewire[lev[i]]
+        bern += (len(se[lev[i]])*(len(se[lev[i]]) - 1))/2
+        su += len(rewire[lev[i]])
     for i in range(n):
 #         print("i",i)
-        g,se,t,tp = rewiring_one(g,rewire,se,bern,dire)
+        g,se,t,tp,nb_rew = rewiring_one(g,rewire,se,bern,su,lev,dire)
         if t != -1:
             rewire[t] = list(rewirings_at_time(se,col,t))
+            su = su - nb_rew
+            su = su + len(rewire[t]) 
             if t != tp:
+                #should never happen
                 rewire[tp] = list(rewirings_at_time(se,col,tp))
 
     return list(g)
@@ -850,114 +854,129 @@ def number_rewirings_randomized_same_time(g):
     return nb
 
 def randomized_edge_same_time_gen(g, dire, tout = -1):
-    if dire == 'u':
-        return randomized_edge_same_time(g, dire, tout)
-    else:
-        return randomized_edge_same_time_directed(g, dire, tout)
-
-
-def randomized_edge_same_time_directed(g, dire, tout = -1):
     V = nodes(g)
     T = events(g)
-    return felix_flips_imp(g,tout, { (v,t):'1' for v in V for t in T } )
-
-
-def randomized_edge_same_time(g, dire, tout = -1):
-    edges = list(g)
-    d = seq_graphs(g)
-    if tout == -1:
-        fin = len(edges)
+    if dire == 'u':
+        return rewire_any(g,tout,{ (v,t):'1' for v in V for t in T },dire)
     else:
-        fin = tout
-    r = 0
-    dist = []
-    possible_t = []
-    ld = dict()
-    ev = events(g)
-    for t in ev:
-        ld[t] = list(d[t])
-        if len(d[t]) > 1:
-            dist.append(int(len(d[t])*(len(d[t]) -1)/2 ))
-            possible_t.append(t)
-#     print("fin", fin)
-    if possible_t == []:
-        print("no possible rewire same time, nothing have been done on the graph")
-        return g
-    while r < fin:
-        t = random.sample(possible_t, k = 1, counts = dist)[0]
-        pair = random.sample(ld[t], k = 2)
-        i,j = pair[0]
-        ip, jp = pair[1]
-        b = random.randint(0,1)
-#         print("selected", (i,j), (ip,jp), d[t])
-        if b == 0 and i!=jp and j!=ip and (i,jp) not in ld[t] and (j,ip) not in ld[t]:
-            x = edges.index( (i,j,t) )
-            edges.pop(x)
-            if dire == "u":
-                x = edges.index( (j,i,t) )
-                edges.pop(x)
-#             print("1", (ip,jp,t) in edges or (jp,ip,t) in edges)
-            x = edges.index( (ip,jp,t) )
-            edges.pop(x)
-            if dire == "u":
-                x = edges.index( (jp,ip,t) )
-                edges.pop(x)
-            ld[t].remove((i,j))
-            if dire == "u":
-                ld[t].remove((j,i))
-            ld[t].remove((ip,jp))
-            if dire == "u":
-                ld[t].remove((jp,ip))
-            ld[t].append((i,jp))
-            if dire == "u":
-                ld[t].append((jp,i))
-            ld[t].append((j,ip))
-            if dire == "u":
-                ld[t].append((ip,j))
+        return felix_flips_imp(g,tout, { (v,t):'1' for v in V for t in T } )
+
+
+# def randomized_edge_same_time(g, dire, tout = -1):
+#     edges = list(g)
+#     d = seq_graphs(g)
+#     if tout == -1:
+#         fin = len(edges)
+#     else:
+#         fin = tout
+#     r = 0
+#     dist = []
+#     possible_t = []
+#     ld = dict()
+#     ev = events(g)
+#     lev = list(ev)
+
+#     for i in range(0,len(lev)):
+#         ld[lev[i]] = list(d[lev[i]])
+#         if len(d[lev[i]]) > 1:
+#             #dist.append(int(len(d[lev[i]])*(len(d[lev[i]]) -1)/2 ))
+#             partial_sum.append( partial_sum[i]  + int(len(d[lev[i]])*(len(d[lev[i]]) -1)/2 ))
+#             possible_t.append(lev[i])
+# #     print("fin", fin)
+#     if possible_t == []:
+#         print("no possible rewire same time, nothing have been done on the graph")
+#         return g
+#     partial_sum.pop(0)
+
+#     while r < fin:
+#         x = random.randint(0,partial_sum[len(partial_sum)-1]-1)
+#         d = 0
+#         f = len(lev) - 1
+#         while f > d:
+#             i = d + (f-d)//2
+#             if x < partial_sum[i]:
+#                 #print("cas 1")
+#                 f = i
+#             else:
+#                 #print("cas 2")
+#                 d = i+1
+#         #normally d = f
+#         t = lev[d]
+
+#         #t = random.sample(possible_t, k = 1, counts = dist)[0]
+#         pair = random.sample(ld[t], k = 2)
+#         i,j = pair[0]
+#         ip, jp = pair[1]
+#         b = random.randint(0,1)
+# #         print("selected", (i,j), (ip,jp), d[t])
+#         if b == 0 and i!=jp and j!=ip and (i,jp) not in ld[t] and (j,ip) not in ld[t]:
+#             x = edges.index( (i,j,t) )
+#             edges.pop(x)
+#             if dire == "u":
+#                 x = edges.index( (j,i,t) )
+#                 edges.pop(x)
+# #             print("1", (ip,jp,t) in edges or (jp,ip,t) in edges)
+#             x = edges.index( (ip,jp,t) )
+#             edges.pop(x)
+#             if dire == "u":
+#                 x = edges.index( (jp,ip,t) )
+#                 edges.pop(x)
+#             ld[t].remove((i,j))
+#             if dire == "u":
+#                 ld[t].remove((j,i))
+#             ld[t].remove((ip,jp))
+#             if dire == "u":
+#                 ld[t].remove((jp,ip))
+#             ld[t].append((i,jp))
+#             if dire == "u":
+#                 ld[t].append((jp,i))
+#             ld[t].append((j,ip))
+#             if dire == "u":
+#                 ld[t].append((ip,j))
                 
-            edges.append( (i,jp,t) )
-            if dire == "u":
-                edges.append( (jp,i,t) )
-            edges.append( (j,ip,t) )
-            if dire == "u":
-                edges.append( (ip,j,t) )
+#             edges.append( (i,jp,t) )
+#             if dire == "u":
+#                 edges.append( (jp,i,t) )
+#             edges.append( (j,ip,t) )
+#             if dire == "u":
+#                 edges.append( (ip,j,t) )
                 
-        elif b == 1 and i!=ip and j!=jp and (i,ip) not in ld[t] and (j,jp) not in ld[t]:
-            x = edges.index( (i,j,t) )
-            edges.pop(x)
-            if dire == "u":
-                x = edges.index( (j,i,t) )
-                edges.pop(x)
-#             print("2", (ip,jp,t) in edges or (jp,ip,t) in edges)
-            x = edges.index( (ip,jp,t) )
-            edges.pop(x)
-            if dire == "u":
-                x = edges.index( (jp,ip,t) )
-                edges.pop(x)
+#         elif b == 1 and i!=ip and j!=jp and (i,ip) not in ld[t] and (j,jp) not in ld[t]:
+#             x = edges.index( (i,j,t) )
+#             edges.pop(x)
+#             if dire == "u":
+#                 x = edges.index( (j,i,t) )
+#                 edges.pop(x)
+# #             print("2", (ip,jp,t) in edges or (jp,ip,t) in edges)
+#             x = edges.index( (ip,jp,t) )
+#             edges.pop(x)
+#             if dire == "u":
+#                 x = edges.index( (jp,ip,t) )
+#                 edges.pop(x)
                 
-            ld[t].remove((i,j))
-            if dire == "u":
-                ld[t].remove((j,i))
-            ld[t].remove((ip,jp))
-            if dire == "u":
-                ld[t].remove((jp,ip))
+#             ld[t].remove((i,j))
+#             if dire == "u":
+#                 ld[t].remove((j,i))
+#             ld[t].remove((ip,jp))
+#             if dire == "u":
+#                 ld[t].remove((jp,ip))
             
-            ld[t].append((i,ip))
-            if dire == "u":
-                ld[t].append((ip,i))
+#             ld[t].append((i,ip))
+#             if dire == "u":
+#                 ld[t].append((ip,i))
                 
-            ld[t].append((j,jp))
-            if dire == "u":
-                ld[t].append((jp,j))
-            edges.append( (i,ip,t) )
-            if dire == "u":
-                edges.append( (ip,i,t) )
+#             ld[t].append((j,jp))
+#             if dire == "u":
+#                 ld[t].append((jp,j))
+#             edges.append( (i,ip,t) )
+#             if dire == "u":
+#                 edges.append( (ip,i,t) )
                 
-            edges.append( (j,jp,t) )
-            if dire == "u":
-                edges.append( (jp,j,t) )
-        r += 1
-    return set(edges)
+#             edges.append( (j,jp,t) )
+#             if dire == "u":
+#                 edges.append( (jp,j,t) )
+#         r += 1
+#     return set(edges)
 
 
 #variant of the preceding a bit more efficient not rewiring if index already rewired
