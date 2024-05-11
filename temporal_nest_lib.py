@@ -766,7 +766,6 @@ def randomized_edge(g, dire, tout = -1):
     while nb_rewired < fin:
 #         print("r", r,end =" ")
 #    440
-        nb = nb_randomized_edge(g)
 #         print("nb possible", nb, "over ", len(g)*len(g), "len edges", len(edges))
 #         print("edges", edges)
         r = random.randint(0,len(edges)-1)
