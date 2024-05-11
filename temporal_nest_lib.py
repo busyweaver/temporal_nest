@@ -497,7 +497,7 @@ def felix_flips_imp(gg,n,col):
         #         break
     for t in flips.keys():
         np = node_partition(node_set, t, col)
-        for _ in flips[t]:
+        for _ in range(flips[t]):
             g,se = felix_flip_bins(g,se,col,t,np)
     return list(g)
 
