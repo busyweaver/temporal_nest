@@ -8,16 +8,7 @@ from graph_characteristics_lib import *
 import os
 import sys
 import math
-import pickle
 
-def save_dic(s,d):
-    with open(s+".pickle", 'w') as handle:
-        pickle.dump(d, handle, protocol=pickle.HIGHEST_PROTOCOL)
-
-def read_dic(s):
-    with open(s+".pickle", 'r') as handle:
-        d = pickle.load(handle)
-    return d
 
 list_rewires = dict()
 
