@@ -412,9 +412,8 @@ def nb_possible_felix(col, V, t, se):
     return nb
 
 
-def felix_flip_bins(g,se,V,col,t,nb):
-    np = node_partition(V, t, col)
-    ep = edge_partition(se[t],t, col)
+def felix_flip_bins(g,se,col,t,np):
+    #ep = edge_partition(se[t],t, col)
     lse = list(se[t])
     nb_possible_per_edge = []
     edges = []
@@ -422,26 +421,25 @@ def felix_flip_bins(g,se,V,col,t,nb):
         if len(np[col[(e[1],t)]]) > 1:
             nb_possible_per_edge.append( len(np[col[(e[1],t)]]) )
             edges.append(e)
-    for _ in range(nb):
-        b = False
-        while not b:
-            e = random.sample(edges, k = 1, counts = nb_possible_per_edge)[0]
-            #e = lse[x]
-            if len(np[col[(e[1],t)]]) > 1:
-                b = True
-                bb = False
-                lelem = list(np[col[(e[1],t)]])
-                while not bb:
-                    y = random.randint(0, len(np[col[(e[1],t)]]) -1)
-                    if lelem[y] != e[1]:
-                        bb = True
-                        #if create self loop do not do it, this also allows self loops in the markov chain
-                    if lelem[y] != e[0]:
-                        se[t].remove(e)
-                        se[t].add(  (e[0], lelem[y]) )
+    b = False
+    while not b:
+        e = random.sample(edges, k = 1, counts = nb_possible_per_edge)[0]
+        #e = lse[x]
+        if len(np[col[(e[1],t)]]) > 1:
+            b = True
+            bb = False
+            lelem = list(np[col[(e[1],t)]])
+            while not bb:
+                y = random.randint(0, len(np[col[(e[1],t)]]) -1)
+                if lelem[y] != e[1]:
+                    bb = True
+                    #if create self loop or multiple edge do not do it, this also allows self loops in the markov chain
+                if lelem[y] != e[0] and (e[0], lelem[y]) not in se[t]:
+                    se[t].remove(e)
+                    se[t].add(  (e[0], lelem[y]) )
 
-                        g.remove( tuple(list(e) + [t])  )
-                        g.add( (e[0], lelem[y],t)  )
+                    g.remove( tuple(list(e) + [t])  )
+                    g.add( (e[0], lelem[y],t)  )
     return g, se
 
 
@@ -498,7 +496,9 @@ def felix_flips_imp(gg,n,col):
         #     if x < 0:
         #         break
     for t in flips.keys():
-        g,se = felix_flip_bins(g,se,node_set,col,t, flips[t])
+        np = node_partition(node_set, t, col)
+        for _ in flips[t]:
+            g,se = felix_flip_bins(g,se,col,t,np)
     return list(g)
 
 
@@ -765,7 +765,8 @@ def randomized_edge(g, dire, tout = -1):
     nb_rewired = 0
     while nb_rewired < fin:
 #         print("r", r,end =" ")
-#         nb = nb_randomized_edge(g)
+#    440
+        nb = nb_randomized_edge(g)
 #         print("nb possible", nb, "over ", len(g)*len(g), "len edges", len(edges))
 #         print("edges", edges)
         r = random.randint(0,len(edges)-1)

@@ -64,6 +64,7 @@ import matplotlib.pyplot as plt
 fig, axs = plt.subplots(2,4)
 for k in range(len(names)):
     e = names[k]
+    print(e)
     g = read_graph(path,e[0],e[-1])
     g = graph_cut(g,names[k][-1],cut)
     i = k//2
@@ -72,6 +73,7 @@ for k in range(len(names)):
     l_ev = list(events(g))
     l_ev.sort()
     mi, ma = l_ev[0], l_ev[-1]
+    print("mi",mi,"ma",ma)
     l_ev_norm = [ (e-mi)/(ma-mi) for e in l_ev ]
 #     print(l_ev_norm)
 #     print("//////////////////////////////////////////",mi,ma)
