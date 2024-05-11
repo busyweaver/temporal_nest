@@ -691,7 +691,7 @@ def rewiring_one(g_new, rewire, se, bern, dire):
         r = t
     return g_new,se,r,tp
 
-def rewire_any(gg,n,col,dire):
+def rewire_any(gg,n,col,dire, list_rew):
     g = set(gg.copy())
     #print(g, is_undirected(g))
     rewire = dict()

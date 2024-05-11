@@ -8,6 +8,18 @@ from graph_characteristics_lib import *
 import os
 import sys
 import math
+import pickle
+
+def save_dic(s,d):
+    with open(s+".pickle", 'w') as handle:
+        pickle.dump(d, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+def read_dic(s):
+    with open(s+".pickle", 'r') as handle:
+        d = pickle.load(handle)
+    return d
+
+list_rewires = dict()
 
 path = "datasets/networks/"
 names = [ ["bison_dire","bis","crimson","d"] , ["cattle_dire", "cat", "green","d"] , ["primate","pri",  "blue","u"], ["racoon", "rac", "brown","u"], ["sheep_dire", "she" ,"olive","d"], ["weaver", "wea",  "pink","u"], ["email-eu3", "eu3", "yellow","d"], ["workplace_2013", "wp", "green","u"]]
@@ -117,6 +129,8 @@ def find_max_wl(folder, name):
 # In[3]:
 
 
+
+
 #do not change the look aheads sequence
 import time
 def stats_numberrewirings_conv(path, names, look_aheads, iterations, cut, folder):
@@ -157,6 +171,10 @@ def stats_numberrewirings_conv(path, names, look_aheads, iterations, cut, folder
                     tmp = dict()
                     if e[-1] == "u":
                         possible_rewire = rewirings(g_new,keep, e[-1])
+                        list_rewires[e[0]] = dict()
+                        if i == 1 or i == max_it:
+                            #for now not used, maybe get rid of it
+                            list_rewires[e[0]][i] = possible_rewire
                         print("possible", len(possible_rewire))
                         for (a,b) in possible_rewire:
                             if a[2] not in tmp:
@@ -496,8 +514,8 @@ def statistics_rewirings_clus(path,names,cut,nb_rewire,folder, folder_res, iter_
             names_keep = folder+names[k][1]+"_"+str(1)+"_"+str(cut)+"_keep"
             max_wl = find_max_wl(folder, names_keep)
             # if want max iteration do this
-            #col = read_dic(names_keep+"_"+str(max_wl))
-            col = read_dic(names_keep+"_"+str(1))
+            col = read_dic(names_keep+"_"+str(max_wl))
+            #col = read_dic(names_keep+"_"+str(1))
             nb = 1
             if nb != 0:
                 m = len(g_new)
