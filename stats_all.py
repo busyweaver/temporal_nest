@@ -10,7 +10,9 @@ import sys
 import math
 
 path = "datasets/networks/"
-names = [ ["opsahl", "opsahl", "black","d"], ["email-eu2", "eu2", "magenta","d"], ["dnc", "dnc", "brown","d"], ["email-eu3", "eu3", "yellow","d"], ["highschool_2011", "hs11", "purple","u"], ["hospital_ward", "hw", "blue","u"], ["ht09", "ht","red","u"], ["workplace_2013", "wp", "green","u"] ]
+names = [ ["bison_dire","bis","crimson","d"] , ["cattle_dire", "cat", "green","d"] , ["primate","pri",  "blue","u"], ["racoon", "rac", "brown","u"], ["sheep_dire", "she" ,"olive","d"], ["weaver", "wea",  "pink","u"], ["email-eu3", "eu3", "yellow","d"], ["workplace_2013", "wp", "green","u"]]
+
+#names = [ ["opsahl", "opsahl", "black","d"], ["email-eu2", "eu2", "magenta","d"], ["dnc", "dnc", "brown","d"], ["email-eu3", "eu3", "yellow","d"], ["highschool_2011", "hs11", "purple","u"], ["hospital_ward", "hw", "blue","u"], ["ht09", "ht","red","u"], ["workplace_2013", "wp", "green","u"] ]
 look_aheads = [0.0,0.2,0.4,0.6,0.8,1]
 iterations = 1
 cut = float(sys.argv[1])
@@ -492,8 +494,8 @@ def statistics_rewirings_clus(path,names,cut,nb_rewire,folder, folder_res, iter_
             names_keep = folder+names[k][1]+"_"+str(1)+"_"+str(cut)+"_keep"
             max_wl = find_max_wl(folder, names_keep)
             # if want max iteration do this
-            col = read_dic(names_keep+"_"+str(max_wl))
-            #col = read_dic(names_keep+"_"+str(1))
+            #col = read_dic(names_keep+"_"+str(max_wl))
+            col = read_dic(names_keep+"_"+str(1))
             nb = 1
             if nb != 0:
                 m = len(g_new)

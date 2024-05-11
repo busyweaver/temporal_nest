@@ -412,7 +412,7 @@ def nb_possible_felix(col, V, t, se):
     return nb
 
 
-def felix_flip_bins(g,se,V,col,t):
+def felix_flip_bins(g,se,V,col,t,nb):
     np = node_partition(V, t, col)
     ep = edge_partition(se[t],t, col)
     lse = list(se[t])
@@ -422,25 +422,26 @@ def felix_flip_bins(g,se,V,col,t):
         if len(np[col[(e[1],t)]]) > 1:
             nb_possible_per_edge.append( len(np[col[(e[1],t)]]) )
             edges.append(e)
-    b = False
-    while not b:
-        e = random.sample(edges, k = 1, counts = nb_possible_per_edge)[0]
-        #e = lse[x]
-        if len(np[col[(e[1],t)]]) > 1:
-            b = True
-            bb = False
-            lelem = list(np[col[(e[1],t)]])
-            while not bb:
-                y = random.randint(0, len(np[col[(e[1],t)]]) -1)
-                if lelem[y] != e[1]:
-                    bb = True
-                #if create self loop do not do it, this also allows self loops in the markov chain
-                if lelem[y] != e[0]:
-                    se[t].remove(e)
-                    se[t].add(  (e[0], lelem[y]) )
+    for _ in range(nb):
+        b = False
+        while not b:
+            e = random.sample(edges, k = 1, counts = nb_possible_per_edge)[0]
+            #e = lse[x]
+            if len(np[col[(e[1],t)]]) > 1:
+                b = True
+                bb = False
+                lelem = list(np[col[(e[1],t)]])
+                while not bb:
+                    y = random.randint(0, len(np[col[(e[1],t)]]) -1)
+                    if lelem[y] != e[1]:
+                        bb = True
+                        #if create self loop do not do it, this also allows self loops in the markov chain
+                    if lelem[y] != e[0]:
+                        se[t].remove(e)
+                        se[t].add(  (e[0], lelem[y]) )
 
-                    g.remove( tuple(list(e) + [t])  )
-                    g.add( (e[0], lelem[y],t)  )
+                        g.remove( tuple(list(e) + [t])  )
+                        g.add( (e[0], lelem[y],t)  )
     return g, se
 
 
@@ -453,12 +454,7 @@ def nb_felix_flips_improved(ev, se, node_set, col):
     return nb_possible, su
 
 
-def felix_flips_imp(gg,n,col):
-    g = set(gg.copy())
-    se = seq_graphs(g)
-    node_set = nodes(g)
-    ev = events(g)
-    lev = list(ev)
+def felix_prep_values(g,se,node_set,ev,lev,col):
     nb_possible, su = nb_felix_flips_improved(ev, se, node_set, col)
     partial_sum = [nb_possible[lev[0]]]
     for i in range(1,len(lev)):
@@ -468,6 +464,17 @@ def felix_flips_imp(gg,n,col):
         return -1
     else:
         print("total possible felix flips directed", su)
+    return su, partial_sum
+
+def felix_flips_imp(gg,n,col):
+    g = set(gg.copy())
+    se = seq_graphs(g)
+    node_set = nodes(g)
+    ev = events(g)
+    lev = list(ev)
+    su, partial_sum = felix_prep_values(g,se,node_set,ev,lev,col)
+
+    flips = dict()
     for _ in range(n):
         x = random.randint(0,su-1)
         d = 0
@@ -482,11 +489,16 @@ def felix_flips_imp(gg,n,col):
                 d = i+1
         #normally d = f
         t = lev[d]
+        if t in flips:
+            flips[t] += 1
+        else:
+            flips[t] = 1
         # for t in ev:
         #     x = x-nb_possible[t]
         #     if x < 0:
         #         break
-        g,se = felix_flip_bins(g,se,node_set,col,t)
+    for t in flips.keys():
+        g,se = felix_flip_bins(g,se,node_set,col,t, flips[t])
     return list(g)
 
 
