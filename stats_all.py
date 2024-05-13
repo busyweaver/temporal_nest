@@ -9,8 +9,13 @@ import os
 import sys
 import math
 
+
+list_rewires = dict()
+
 path = "datasets/networks/"
-names = [ ["opsahl", "opsahl", "black","d"], ["email-eu2", "eu2", "magenta","d"], ["dnc", "dnc", "brown","d"], ["email-eu3", "eu3", "yellow","d"], ["highschool_2011", "hs11", "purple","u"], ["hospital_ward", "hw", "blue","u"], ["ht09", "ht","red","u"], ["workplace_2013", "wp", "green","u"] ]
+names = [ ["bison_dire","bis","crimson","d"] , ["cattle_dire", "cat", "green","d"] , ["primate","pri",  "blue","u"], ["racoon", "rac", "brown","u"], ["sheep_dire", "she" ,"olive","d"], ["weaver", "wea",  "pink","u"], ["email-eu3", "eu3", "yellow","d"], ["workplace_2013", "wp", "green","u"]]
+
+#names = [ ["opsahl", "opsahl", "black","d"], ["email-eu2", "eu2", "magenta","d"], ["dnc", "dnc", "brown","d"], ["email-eu3", "eu3", "yellow","d"], ["highschool_2011", "hs11", "purple","u"], ["hospital_ward", "hw", "blue","u"], ["ht09", "ht","red","u"], ["workplace_2013", "wp", "green","u"] ]
 look_aheads = [0.0,0.2,0.4,0.6,0.8,1]
 iterations = 1
 cut = float(sys.argv[1])
@@ -62,6 +67,7 @@ import matplotlib.pyplot as plt
 fig, axs = plt.subplots(2,4)
 for k in range(len(names)):
     e = names[k]
+    print(e)
     g = read_graph(path,e[0],e[-1])
     g = graph_cut(g,names[k][-1],cut)
     i = k//2
@@ -70,6 +76,7 @@ for k in range(len(names)):
     l_ev = list(events(g))
     l_ev.sort()
     mi, ma = l_ev[0], l_ev[-1]
+    print("mi",mi,"ma",ma)
     l_ev_norm = [ (e-mi)/(ma-mi) for e in l_ev ]
 #     print(l_ev_norm)
 #     print("//////////////////////////////////////////",mi,ma)
@@ -113,6 +120,8 @@ def find_max_wl(folder, name):
 # In[3]:
 
 
+
+
 #do not change the look aheads sequence
 import time
 def stats_numberrewirings_conv(path, names, look_aheads, iterations, cut, folder):
@@ -153,6 +162,10 @@ def stats_numberrewirings_conv(path, names, look_aheads, iterations, cut, folder
                     tmp = dict()
                     if e[-1] == "u":
                         possible_rewire = rewirings(g_new,keep, e[-1])
+                        list_rewires[e[0]] = dict()
+                        if i == 1 or i == max_it:
+                            #for now not used, maybe get rid of it
+                            list_rewires[e[0]][i] = possible_rewire
                         print("possible", len(possible_rewire))
                         for (a,b) in possible_rewire:
                             if a[2] not in tmp:

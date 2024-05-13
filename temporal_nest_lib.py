@@ -412,9 +412,8 @@ def nb_possible_felix(col, V, t, se):
     return nb
 
 
-def felix_flip_bins(g,se,V,col,t):
-    np = node_partition(V, t, col)
-    ep = edge_partition(se[t],t, col)
+def felix_flip_bins(g,se,col,t,np):
+    #ep = edge_partition(se[t],t, col)
     lse = list(se[t])
     nb_possible_per_edge = []
     edges = []
@@ -434,8 +433,8 @@ def felix_flip_bins(g,se,V,col,t):
                 y = random.randint(0, len(np[col[(e[1],t)]]) -1)
                 if lelem[y] != e[1]:
                     bb = True
-                #if create self loop do not do it, this also allows self loops in the markov chain
-                if lelem[y] != e[0]:
+                    #if create self loop or multiple edge do not do it, this also allows self loops in the markov chain
+                if lelem[y] != e[0] and (e[0], lelem[y]) not in se[t]:
                     se[t].remove(e)
                     se[t].add(  (e[0], lelem[y]) )
 
@@ -453,12 +452,7 @@ def nb_felix_flips_improved(ev, se, node_set, col):
     return nb_possible, su
 
 
-def felix_flips_imp(gg,n,col):
-    g = set(gg.copy())
-    se = seq_graphs(g)
-    node_set = nodes(g)
-    ev = events(g)
-    lev = list(ev)
+def felix_prep_values(g,se,node_set,ev,lev,col):
     nb_possible, su = nb_felix_flips_improved(ev, se, node_set, col)
     partial_sum = [nb_possible[lev[0]]]
     for i in range(1,len(lev)):
@@ -468,6 +462,17 @@ def felix_flips_imp(gg,n,col):
         return -1
     else:
         print("total possible felix flips directed", su)
+    return su, partial_sum
+
+def felix_flips_imp(gg,n,col):
+    g = set(gg.copy())
+    se = seq_graphs(g)
+    node_set = nodes(g)
+    ev = events(g)
+    lev = list(ev)
+    su, partial_sum = felix_prep_values(g,se,node_set,ev,lev,col)
+
+    flips = dict()
     for _ in range(n):
         x = random.randint(0,su-1)
         d = 0
@@ -482,11 +487,18 @@ def felix_flips_imp(gg,n,col):
                 d = i+1
         #normally d = f
         t = lev[d]
+        if t in flips:
+            flips[t] += 1
+        else:
+            flips[t] = 1
         # for t in ev:
         #     x = x-nb_possible[t]
         #     if x < 0:
         #         break
-        g,se = felix_flip_bins(g,se,node_set,col,t)
+    for t in flips.keys():
+        np = node_partition(node_set, t, col)
+        for _ in range(flips[t]):
+            g,se = felix_flip_bins(g,se,col,t,np)
     return list(g)
 
 
@@ -661,7 +673,6 @@ def rewiring_one(g_new, rewire, se, bern, su, lev, dire):
         se[tp].remove((c,d))
         if dire=="u":
             se[tp].remove((d,c))
-                
         g_new.add((a,d,t))
         if dire=="u":
             g_new.add((d,a,t))
@@ -757,7 +768,7 @@ def randomized_edge(g, dire, tout = -1):
     nb_rewired = 0
     while nb_rewired < fin:
 #         print("r", r,end =" ")
-#         nb = nb_randomized_edge(g)
+#    440
 #         print("nb possible", nb, "over ", len(g)*len(g), "len edges", len(edges))
 #         print("edges", edges)
         r = random.randint(0,len(edges)-1)
