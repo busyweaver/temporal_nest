@@ -674,7 +674,6 @@ def rewiring_one(g_new, rewire, se, bern, dire):
         se[tp].remove((c,d))
         if dire=="u":
             se[tp].remove((d,c))
-                
         g_new.add((a,d,t))
         if dire=="u":
             g_new.add((d,a,t))
