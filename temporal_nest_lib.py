@@ -197,11 +197,15 @@ def graph_time(g,t):
             res.add((a,b,tp))
     return res
 
-def graph_cut(g, dire, tau):
+def sort_graph(g):
     lg = list(g)
     lgo = [ [e[2],e] for e in lg ]
     lgo.sort()
     lgo = [ e[1] for e in lgo ]
+    return lgo
+
+def graph_cut(g, dire, tau):
+    lgo = sort_graph(g)
     val = int(len(lgo)*tau)
     g_new = lgo[:val]
     if dire == "u":
@@ -284,6 +288,7 @@ def weisfeiler_lehman_graph_hash(
                 label = _neighborhood_aggregate(node, t, labels, nei[node], l_ev[-1], l_ev[0], look_ahead)
                 new_labels[(node,t)] = _hash_label(label, digest_size)
         return new_labels
+    G = sort_graph(G)
     nod = nodes(G)
     ev = events(G)
     l_ev = list(ev)
@@ -575,21 +580,40 @@ def rewirings_at_time(seq_g,col,t):
     if len(edges) >= 2:
         for (a,b) in edges:
             for (c,d) in edges:
+                #print("current", (a,b), (c,d))
                 if (a,b) != (c,d):
 #                         print("color", (a,t), (c,t), (b,t), (d,t))
                     # maybe add condition if a==c , not rewire because it does not change anything : update done
                     if col[(a,t)] == col[(c,t)] and col[(b,t)] == col[(b,t)]:
 
                         if (a,d) not in edges and (c,b) not in edges and a!= c and a!=d and b!=c:
-                            l1 = [a,b]
-                            l1.sort()
-                            l2 = [c,d]
-                            l2.sort()
-                            if l1[0] > l2[0]:
-                                rew = ( (l2[0], l2[1], t), (l1[0], l1[1], t) )
-                            else:
-                                rew = ( (l1[0], l1[1], t), (l2[0], l2[1], t) )
-                            if rew not in res:
+                            rew = [ (a,b,t), (c,d,t)  ]
+                            rew = tuple(rew)
+
+                            rew2 = [ (d,c,t), (b,a,t)  ]
+                            rew2 = tuple(rew2)
+
+                            rew3 = [ (b,a,t), (d,c,t)  ]
+                            rew3 = tuple(rew3)
+
+                            rew4 = [ (c,d,t), (a,b,t)  ]
+                            rew4 = tuple(rew4)
+
+                            # rew2 = [ (b,a,t), (d,c,t)  ]
+                            # rew2.sort()
+                            # rew2 = tuple(rew)
+                            # l1 = [a,b]
+                            # l1.sort()
+                            # l2 = [c,d]
+                            # l2.sort()
+                            # if l1[0] > l2[0]:
+                            #     rew = ( (l2[0], l2[1], t), (l1[0], l1[1], t) )
+                            # else:
+                            #     rew = ( (l1[0], l1[1], t), (l2[0], l2[1], t) )
+                            #print("1234",rew,rew2,rew3,rew4)
+                            #print(res)
+                            if (rew not in res) and (rew2 not in res) and (rew3 not in res) and (rew4 not in res):
+                                #print("adding", rew)
                                 res.add(rew)
     return res
 
@@ -657,7 +681,7 @@ def rewiring_one(g_new, rewire, se, bern, su, lev, dire):
                 break
         (a,b,t),(c,d,tp) = rewire[lev[j]][i]
         nb_rew = len(rewire[lev[j]])
-        #print("rew", (a,b,t),(c,d,tp))
+        # print("rew", (a,b,t),(c,d,tp))
 
         g_new.remove((a,b,t))
         if dire=="u":
@@ -706,8 +730,10 @@ def rewire_any(gg,n,col,dire):
         bern += (len(se[lev[i]])*(len(se[lev[i]]) - 1))/2
         su += len(rewire[lev[i]])
     for i in range(n):
-#         print("i",i)
+        # print("i",i)
+        # print("possible", rewire)
         g,se,t,tp,nb_rew = rewiring_one(g,rewire,se,bern,su,lev,dire)
+        #print(g,se,t,nb_rew)
         if t != -1:
             rewire[t] = list(rewirings_at_time(se,col,t))
             su = su - nb_rew
