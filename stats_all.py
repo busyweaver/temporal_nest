@@ -13,7 +13,11 @@ import math
 list_rewires = dict()
 
 path = "datasets/networks/"
-names = [ ["bison_dire","bis","crimson","d"] , ["cattle_dire", "cat", "green","d"] , ["primate","pri",  "blue","u"], ["racoon", "rac", "brown","u"], ["sheep_dire", "she" ,"olive","d"], ["weaver", "wea",  "pink","u"], ["email-eu3", "eu3", "yellow","d"], ["workplace_2013", "wp", "green","u"]]
+names = [ ["bison_dire","bis","crimson","d"] , ["cattle_dire", "cat", "green","d"],
+          ["email-eu2", "eu2", "magenta","d"], ["sheep_dire", "she" ,"olive","d"],
+          ["email-eu3", "eu3", "yellow","d"], ["primate","pri",  "blue","u"],
+          ["racoon", "rac", "brown","u"],  ["weaver", "wea",  "pink","u"],
+          ["workplace_2013", "wp", "black","u"], ["ht09", "ht","red","u"]]
 
 #names = [ ["opsahl", "opsahl", "black","d"], ["email-eu2", "eu2", "magenta","d"], ["dnc", "dnc", "brown","d"], ["email-eu3", "eu3", "yellow","d"], ["highschool_2011", "hs11", "purple","u"], ["hospital_ward", "hw", "blue","u"], ["ht09", "ht","red","u"], ["workplace_2013", "wp", "green","u"] ]
 look_aheads = [0.0,0.2,0.4,0.6,0.8,1]
