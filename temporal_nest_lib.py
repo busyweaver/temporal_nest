@@ -766,7 +766,7 @@ def randomized_edge_gen(g, dire, tout = -1):
 
 def randomized_edge_directed(gg, dire, tout = -1):
     g = set(gg.copy())
-    #se = seq_graphs(g)
+    se = seq_graphs(g)
     node_set = nodes(g)
     lv = list(node_set)
     ev = events(g)
@@ -777,7 +777,7 @@ def randomized_edge_directed(gg, dire, tout = -1):
         u,v,t = lg[i]
         w = random.choice(lv)
         tp = random.choice(lev)
-        if w!=v:
+        if w!=v and (u,w) not in se[tp]:
             lg.pop(i)
             lg.append((u,w,tp))
     return lg
@@ -786,7 +786,9 @@ def randomized_edge_directed(gg, dire, tout = -1):
 def randomized_edge(g, dire, tout = -1):
     edges = list(g)
     d = seq_graphs(g)
-    random.shuffle(edges)
+    #ld = {t : list(d[t]) for t in d.keys()}
+    #next line not necessary as i think
+    #random.shuffle(edges)
     if tout == -1:
         fin = len(edges)
     else:
@@ -812,9 +814,13 @@ def randomized_edge(g, dire, tout = -1):
                 x = edges.index((j,i,t))
                 edges.pop(x)
                 d[t].remove((j,i))
-                
-            x = edges.index((ip,jp,tp))
-            edges.pop(x)
+           
+            if s < r:
+                edges.pop(s)
+            else:
+                edges.pop(s-1)
+            #x = edges.index((ip,jp,tp))
+            #edges.pop(x)
             d[tp].remove((ip,jp))
             if dire == "u":
                 x = edges.index((jp,ip,tp))
@@ -894,126 +900,190 @@ def randomized_edge_same_time_gen(g, dire, tout = -1):
     V = nodes(g)
     T = events(g)
     if dire == 'u':
-        return rewire_any(g,tout,{ (v,t):'1' for v in V for t in T },dire)
+        return randomized_edge_same_time(g, dire, tout)
+        #return rewire_any(g,tout,{ (v,t):'1' for v in V for t in T },dire)
     else:
         return felix_flips_imp(g,tout, { (v,t):'1' for v in V for t in T } )
 
+def reconst_graph(d):
+    ev = list(d.keys())
+    edges = set()
+    for t in ev:
+        for e in d[t]:
+            edges.add( (e[0],e[1], t) )
+    return edges
 
-# def randomized_edge_same_time(g, dire, tout = -1):
-#     edges = list(g)
-#     d = seq_graphs(g)
-#     if tout == -1:
-#         fin = len(edges)
-#     else:
-#         fin = tout
-#     r = 0
-#     dist = []
-#     possible_t = []
-#     ld = dict()
-#     ev = events(g)
-#     lev = list(ev)
 
-#     for i in range(0,len(lev)):
-#         ld[lev[i]] = list(d[lev[i]])
-#         if len(d[lev[i]]) > 1:
-#             #dist.append(int(len(d[lev[i]])*(len(d[lev[i]]) -1)/2 ))
-#             partial_sum.append( partial_sum[i]  + int(len(d[lev[i]])*(len(d[lev[i]]) -1)/2 ))
-#             possible_t.append(lev[i])
-# #     print("fin", fin)
-#     if possible_t == []:
-#         print("no possible rewire same time, nothing have been done on the graph")
-#         return g
-#     partial_sum.pop(0)
+def randomized_edge_same_time(g, dire, tout = -1):
+    edges = list(g)
+    d = seq_graphs(g)
+    if tout == -1:
+        fin = len(edges)
+    else:
+        fin = tout
+    r = 0
+    dist = []
+    possible_t = []
+    ld = dict()
+    ev = events(g)
+    lev = list(ev)
 
-#     while r < fin:
-#         x = random.randint(0,partial_sum[len(partial_sum)-1]-1)
-#         d = 0
-#         f = len(lev) - 1
-#         while f > d:
-#             i = d + (f-d)//2
-#             if x < partial_sum[i]:
-#                 #print("cas 1")
-#                 f = i
-#             else:
-#                 #print("cas 2")
-#                 d = i+1
-#         #normally d = f
-#         t = lev[d]
+    for i in range(0,len(lev)):
+        ld[lev[i]] = list(d[lev[i]])
+        if len(d[lev[i]]) > 1:
+            #dist.append(int(len(d[lev[i]])*(len(d[lev[i]]) -1)/2 ))
+            partial_sum.append( partial_sum[i]  + int(len(d[lev[i]])*(len(d[lev[i]]) -1)/2 ))
+            possible_t.append(lev[i])
+#     print("fin", fin)
+    if possible_t == []:
+        print("no possible rewire same time, nothing have been done on the graph")
+        return g
+    partial_sum.pop(0)
 
-#         #t = random.sample(possible_t, k = 1, counts = dist)[0]
-#         pair = random.sample(ld[t], k = 2)
-#         i,j = pair[0]
-#         ip, jp = pair[1]
-#         b = random.randint(0,1)
-# #         print("selected", (i,j), (ip,jp), d[t])
-#         if b == 0 and i!=jp and j!=ip and (i,jp) not in ld[t] and (j,ip) not in ld[t]:
-#             x = edges.index( (i,j,t) )
-#             edges.pop(x)
-#             if dire == "u":
-#                 x = edges.index( (j,i,t) )
-#                 edges.pop(x)
-# #             print("1", (ip,jp,t) in edges or (jp,ip,t) in edges)
-#             x = edges.index( (ip,jp,t) )
-#             edges.pop(x)
-#             if dire == "u":
-#                 x = edges.index( (jp,ip,t) )
-#                 edges.pop(x)
-#             ld[t].remove((i,j))
-#             if dire == "u":
-#                 ld[t].remove((j,i))
-#             ld[t].remove((ip,jp))
-#             if dire == "u":
-#                 ld[t].remove((jp,ip))
-#             ld[t].append((i,jp))
-#             if dire == "u":
-#                 ld[t].append((jp,i))
-#             ld[t].append((j,ip))
-#             if dire == "u":
-#                 ld[t].append((ip,j))
+    while r < fin:
+        x = random.randint(0,partial_sum[len(partial_sum)-1]-1)
+        d = 0
+        f = len(lev) - 1
+        while f > d:
+            i = d + (f-d)//2
+            if x < partial_sum[i]:
+                #print("cas 1")
+                f = i
+            else:
+                #print("cas 2")
+                d = i+1
+        #normally d = f
+        t = lev[d]
+
+        #t = random.sample(possible_t, k = 1, counts = dist)[0]
+        pair = random.sample(ld[t], k = 2)
+        i,j = pair[0]
+        ip, jp = pair[1]
+        b = random.randint(0,1)
+#         print("selected", (i,j), (ip,jp), d[t])
+        if b == 0 and i!=jp and j!=ip and (i,jp) not in ld[t] and (j,ip) not in ld[t]:
+            ld[t].remove((i,j))
+            if dire == "u":
+                ld[t].remove((j,i))
+            ld[t].remove((ip,jp))
+            if dire == "u":
+                ld[t].remove((jp,ip))
+            ld[t].append((i,jp))
+            if dire == "u":
+                ld[t].append((jp,i))
+            ld[t].append((j,ip))
+            if dire == "u":
+                ld[t].append((ip,j))
                 
-#             edges.append( (i,jp,t) )
-#             if dire == "u":
-#                 edges.append( (jp,i,t) )
-#             edges.append( (j,ip,t) )
-#             if dire == "u":
-#                 edges.append( (ip,j,t) )
+        elif b == 1 and i!=ip and j!=jp and (i,ip) not in ld[t] and (j,jp) not in ld[t]:
                 
-#         elif b == 1 and i!=ip and j!=jp and (i,ip) not in ld[t] and (j,jp) not in ld[t]:
-#             x = edges.index( (i,j,t) )
-#             edges.pop(x)
-#             if dire == "u":
-#                 x = edges.index( (j,i,t) )
-#                 edges.pop(x)
-# #             print("2", (ip,jp,t) in edges or (jp,ip,t) in edges)
-#             x = edges.index( (ip,jp,t) )
-#             edges.pop(x)
-#             if dire == "u":
-#                 x = edges.index( (jp,ip,t) )
-#                 edges.pop(x)
-                
-#             ld[t].remove((i,j))
-#             if dire == "u":
-#                 ld[t].remove((j,i))
-#             ld[t].remove((ip,jp))
-#             if dire == "u":
-#                 ld[t].remove((jp,ip))
+            ld[t].remove((i,j))
+            if dire == "u":
+                ld[t].remove((j,i))
+            ld[t].remove((ip,jp))
+            if dire == "u":
+                ld[t].remove((jp,ip))
             
-#             ld[t].append((i,ip))
-#             if dire == "u":
-#                 ld[t].append((ip,i))
+            ld[t].append((i,ip))
+            if dire == "u":
+                ld[t].append((ip,i))
                 
-#             ld[t].append((j,jp))
-#             if dire == "u":
-#                 ld[t].append((jp,j))
-#             edges.append( (i,ip,t) )
-#             if dire == "u":
-#                 edges.append( (ip,i,t) )
+            ld[t].append((j,jp))
+            if dire == "u":
+                ld[t].append((jp,j))
+        r += 1
+    edges = reconst_graph(ld)
+    return set(edges)
+
+    def randomized_edge_same_time_non_uniform(g, dire, tout = -1):
+    edges = list(g)
+    d = seq_graphs(g)
+    if tout == -1:
+        fin = len(edges)
+    else:
+        fin = tout
+    r = 0
+
+
+    event_pos = list(filter(lambda x : d[x]>=2, list(d.keys()) ))
+    ld = {t:list(d[t]) for t in event_pos}
+
+    while r < fin:
+        t = random.randint(0,len(event_pos)-1)
+        pair = random.sample(ld[t], k = 2)
+        i,j = pair[0]
+        ip, jp = pair[1]
+        b = random.randint(0,1)
+#         print("selected", (i,j), (ip,jp), d[t])
+        if b == 0 and i!=jp and j!=ip and (i,jp) not in ld[t] and (j,ip) not in ld[t]:
+            x = edges.index( (i,j,t) )
+            edges.pop(x)
+            if dire == "u":
+                x = edges.index( (j,i,t) )
+                edges.pop(x)
+#             print("1", (ip,jp,t) in edges or (jp,ip,t) in edges)
+            x = edges.index( (ip,jp,t) )
+            edges.pop(x)
+            if dire == "u":
+                x = edges.index( (jp,ip,t) )
+                edges.pop(x)
+            ld[t].remove((i,j))
+            if dire == "u":
+                ld[t].remove((j,i))
+            ld[t].remove((ip,jp))
+            if dire == "u":
+                ld[t].remove((jp,ip))
+            ld[t].append((i,jp))
+            if dire == "u":
+                ld[t].append((jp,i))
+            ld[t].append((j,ip))
+            if dire == "u":
+                ld[t].append((ip,j))
                 
-#             edges.append( (j,jp,t) )
-#             if dire == "u":
-#                 edges.append( (jp,j,t) )
-#         r += 1
-#     return set(edges)
+            edges.append( (i,jp,t) )
+            if dire == "u":
+                edges.append( (jp,i,t) )
+            edges.append( (j,ip,t) )
+            if dire == "u":
+                edges.append( (ip,j,t) )
+                
+        elif b == 1 and i!=ip and j!=jp and (i,ip) not in ld[t] and (j,jp) not in ld[t]:
+            x = edges.index( (i,j,t) )
+            edges.pop(x)
+            if dire == "u":
+                x = edges.index( (j,i,t) )
+                edges.pop(x)
+#             print("2", (ip,jp,t) in edges or (jp,ip,t) in edges)
+            x = edges.index( (ip,jp,t) )
+            edges.pop(x)
+            if dire == "u":
+                x = edges.index( (jp,ip,t) )
+                edges.pop(x)
+                
+            ld[t].remove((i,j))
+            if dire == "u":
+                ld[t].remove((j,i))
+            ld[t].remove((ip,jp))
+            if dire == "u":
+                ld[t].remove((jp,ip))
+            
+            ld[t].append((i,ip))
+            if dire == "u":
+                ld[t].append((ip,i))
+                
+            ld[t].append((j,jp))
+            if dire == "u":
+                ld[t].append((jp,j))
+            edges.append( (i,ip,t) )
+            if dire == "u":
+                edges.append( (ip,i,t) )
+                
+            edges.append( (j,jp,t) )
+            if dire == "u":
+                edges.append( (jp,j,t) )
+        r += 1
+    return set(edges)
+
 
 
 #variant of the preceding a bit more efficient not rewiring if index already rewired
@@ -1171,6 +1241,7 @@ def randomize(g,n,col,dire):
     print("fin g1")
     g2 = randomized_edge_same_time_gen(g,dire, n)
     print("fin g2")
+    # here i dont use uniform colors in the undirected case because thre would be a lot of of saved edges. 
     g3 = randomized_edge_gen(g,dire,n)
     print("fin g3")
     return g1, g2, g3
