@@ -995,7 +995,8 @@ def randomized_edge_same_time(g, dire, tout = -1):
     edges = reconst_graph(ld)
     return set(edges)
 
-    def randomized_edge_same_time_non_uniform(g, dire, tout = -1):
+#not tested maybe not working
+def randomized_edge_same_time_non_uniform(g, dire, tout = -1):
     edges = list(g)
     d = seq_graphs(g)
     if tout == -1:
