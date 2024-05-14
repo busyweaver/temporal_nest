@@ -927,6 +927,7 @@ def randomized_edge_same_time(g, dire, tout = -1):
     ld = dict()
     ev = events(g)
     lev = list(ev)
+    partial_sum = [0]
 
     for i in range(0,len(lev)):
         ld[lev[i]] = list(d[lev[i]])
