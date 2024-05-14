@@ -595,8 +595,8 @@ def statistics_rewirings_clus(path,names,cut,nb_rewire,folder, folder_res, iter_
 
             fg.close()
             # fg2.close()
-    else:
-        print("file statistics_rewirings already present")
+        else:
+            print("file statistics_rewirings already present")
 
 
 
