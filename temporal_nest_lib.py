@@ -866,7 +866,9 @@ def randomized_edge(g, dire, tout = -1):
         nb_rewired += 1
     if nb_rewired < fin:
         print("randomized edge : probleme no possible rewirings to finish job ", r, "rewirings done out of ", fin)
-    for e in edges:
+    length = len(edges)
+    for i in range(length):
+        e = edges[i]
         edges.append( (e[1],e[0],e[2]) )
     return set(edges)
 
