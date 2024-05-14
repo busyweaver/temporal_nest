@@ -782,13 +782,16 @@ def randomized_edge_directed(gg, dire, tout = -1):
             lg.append((u,w,tp))
     return lg
 
-    
+#only works with undirected graphs
 def randomized_edge(g, dire, tout = -1):
-    edges = list(g)
     d = seq_graphs(g)
-    #ld = {t : list(d[t]) for t in d.keys()}
-    #next line not necessary as i think
-    #random.shuffle(edges)
+
+    edges = set()
+    for e in g:
+        if (e[1],e[0],e[2]) not in edges:
+            edges.add(e)
+    edges = list(edges)
+    
     if tout == -1:
         fin = len(edges)
     else:
@@ -811,8 +814,6 @@ def randomized_edge(g, dire, tout = -1):
             d[t].remove((i,j))
 #             print("edges in", edges)
             if dire == "u":
-                x = edges.index((j,i,t))
-                edges.pop(x)
                 d[t].remove((j,i))
            
             if s < r:
@@ -823,20 +824,16 @@ def randomized_edge(g, dire, tout = -1):
             #edges.pop(x)
             d[tp].remove((ip,jp))
             if dire == "u":
-                x = edges.index((jp,ip,tp))
-                edges.pop(x)
                 d[tp].remove((jp,ip))
                 
             edges.append( (i,jp,t) )
             d[t].add((i,jp))
             if dire == "u":
-                edges.append( (jp,i,t) )
                 d[t].add((jp,i))
                 
             edges.append( (j,ip,tp) )
             d[tp].add((j,ip))
             if dire == "u":
-                edges.append( (ip,j,tp) )
                 d[tp].add((ip,j))
                         
         elif not b and r != s and i!=ip and j!=jp and (i,ip) not in d[t] and (j,jp) not in d[tp]:
@@ -844,33 +841,31 @@ def randomized_edge(g, dire, tout = -1):
             d[t].remove((i,j))
             
             if dire == "u":
-                x = edges.index((j,i,t))
-                edges.pop(x)
                 d[t].remove((j,i))
-            #for s
-            x = edges.index((ip,jp,tp))
-            edges.pop(x)
+
+            if s < r:
+                edges.pop(s)
+            else:
+                edges.pop(s-1)
             d[tp].remove((ip,jp))
             if dire == "u":
-                x = edges.index((jp,ip,tp))
-                edges.pop(x)
                 d[tp].remove((jp,ip))
                 
             edges.append( (i,ip,t) )
             d[t].add((i,ip))
             if dire == "u":
-                edges.append( (ip,i,t) )
                 d[t].add((ip,i))
                 
             edges.append( (j,jp,tp) )
             d[tp].add((j,jp))
             if dire == "u":
-                edges.append( (jp,j,tp) )
                 d[tp].add((jp,j))
                 
         nb_rewired += 1
     if nb_rewired < fin:
         print("randomized edge : probleme no possible rewirings to finish job ", r, "rewirings done out of ", fin)
+    for e in edges:
+        edges.add( (e[1],e[0],e[2]) )
     return set(edges)
 
 
