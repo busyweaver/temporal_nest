@@ -798,6 +798,8 @@ def randomized_edge(g, dire, tout = -1):
         fin = tout
     nb_rewired = 0
     while nb_rewired < fin:
+        if nb_rewired % 1000 == 0:
+            print(nb_rewired, fin)
 #         print("r", r,end =" ")
 #    440
 #         print("nb possible", nb, "over ", len(g)*len(g), "len edges", len(edges))
