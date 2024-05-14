@@ -584,7 +584,7 @@ def rewirings_at_time(seq_g,col,t):
                 if (a,b) != (c,d):
 #                         print("color", (a,t), (c,t), (b,t), (d,t))
                     # maybe add condition if a==c , not rewire because it does not change anything : update done
-                    if col[(a,t)] == col[(c,t)] and col[(b,t)] == col[(b,t)]:
+                    if col[(a,t)] == col[(c,t)] and col[(b,t)] == col[(d,t)]:
 
                         if (a,d) not in edges and (c,b) not in edges and a!= c and a!=d and b!=c:
                             rew = [ (a,b,t), (c,d,t)  ]
@@ -743,6 +743,8 @@ def rewire_any(gg,n,col,dire):
                 rewire[tp] = list(rewirings_at_time(se,col,tp))
 
     return list(g)
+
+
 
 def nb_randomized_edge(g):
     edges = list(g)
@@ -995,6 +997,71 @@ def randomized_edge_same_time(g, dire, tout = -1):
     edges = reconst_graph(ld)
     return set(edges)
 
+def rewire_any_imp(g, col, dire, tout = -1):
+    edges = list(g)
+    d = seq_graphs(g)
+    if tout == -1:
+        fin = len(edges)
+    else:
+        fin = tout
+    r = 0
+    dist = []
+    possible_t = []
+    ld = dict()
+    ev = events(g)
+    lev = list(ev)
+    partial_sum = [0]
+
+    for i in range(0,len(lev)):
+        ld[lev[i]] = list(d[lev[i]])
+        if len(d[lev[i]]) > 1:
+            #dist.append(int(len(d[lev[i]])*(len(d[lev[i]]) -1)/2 ))
+            partial_sum.append( partial_sum[i]  + int(len(d[lev[i]])*(len(d[lev[i]]) -1)/2 ))
+            possible_t.append(lev[i])
+#     print("fin", fin)
+    if possible_t == []:
+        print("no possible rewire conv imp, nothing have been done on the graph")
+        return g
+    partial_sum.pop(0)
+
+    while r < fin:
+        x = random.randint(0,partial_sum[len(partial_sum)-1]-1)
+        d = 0
+        f = len(lev) - 1
+        while f > d:
+            i = d + (f-d)//2
+            if x < partial_sum[i]:
+                #print("cas 1")
+                f = i
+            else:
+                #print("cas 2")
+                d = i+1
+        #normally d = f
+        t = lev[d]
+
+        #t = random.sample(possible_t, k = 1, counts = dist)[0]
+        pair = random.sample(ld[t], k = 2)
+        i,j = pair[0]
+        ip, jp = pair[1]
+
+        if col[(i,t)]==col[(ip,t)] and col[(j,t)] == col[(jp,t)] and i!=jp and j!=ip and (i,jp) not in ld[t] and (j,ip) not in ld[t]:
+            ld[t].remove((i,j))
+            if dire == "u":
+                ld[t].remove((j,i))
+            ld[t].remove((ip,jp))
+            if dire == "u":
+                ld[t].remove((jp,ip))
+            ld[t].append((i,jp))
+            if dire == "u":
+                ld[t].append((jp,i))
+            ld[t].append((ip,j))
+            if dire == "u":
+                ld[t].append((j,ip))
+        r += 1
+    edges = reconst_graph(ld)
+    return set(edges)
+
+
 #not tested maybe not working
 def randomized_edge_same_time_non_uniform(g, dire, tout = -1):
     edges = list(g)
@@ -1235,7 +1302,8 @@ def randomize(g,n,col,dire):
 #     print("start ****")
     g_tmp = g[:]
     if dire == "u":
-        g1 = rewire_any(g,n,col,dire)
+        g1 = rewire_any_imp(g,col, dire, n)
+        #g1 = rewire_any(g,n,col,dire)
     else:
         g1 = felix_flips_imp(g,n,col)
         #g1 = felix_flips(g,n,col)
