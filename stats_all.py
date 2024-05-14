@@ -68,7 +68,7 @@ if not os.path.exists(folder_res):
 from matplotlib.pyplot import figure
 import numpy as np
 import matplotlib.pyplot as plt
-fig, axs = plt.subplots(2,4)
+fig, axs = plt.subplots(2,int(len(names)/2))
 for k in range(len(names)):
     e = names[k]
     print(e)
@@ -241,7 +241,7 @@ write_characteristics_table(folder_res, folder, names, cut)
 from matplotlib.pyplot import figure
 import numpy as np
 import matplotlib.pyplot as plt
-fig, axs = plt.subplots(2,4)
+fig, axs = plt.subplots(2,int(len(names)/2))
 for k in range(len(names)):
 #     print(names[k][0])
     dd = dict()
@@ -280,7 +280,7 @@ fig.show()
 from matplotlib.pyplot import figure
 import numpy as np
 import matplotlib.pyplot as plt
-fig, axs = plt.subplots(2,4)
+fig, axs = plt.subplots(2,int(len(names)/2))
 for k in range(len(names)):
     dd = dict()
     for e in look_aheads:
@@ -323,7 +323,7 @@ from matplotlib.pyplot import cm
 import numpy as np
 import matplotlib.pyplot as plt
 
-fig, axs = plt.subplots(2,4)
+fig, axs = plt.subplots(2,int(len(names)/2))
 for k in range(len(names)):
     dd = dict()
     for e in look_aheads:
@@ -387,7 +387,7 @@ from matplotlib.pyplot import cm
 import numpy as np
 import matplotlib.pyplot as plt
 
-fig, axs = plt.subplots(2,4)
+fig, axs = plt.subplots(2,int(len(names)/2))
 for k in range(len(names)):
     print(names[k][0])
     dd = dict()
