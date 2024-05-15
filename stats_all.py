@@ -13,7 +13,7 @@ import math
 list_rewires = dict()
 
 path = "datasets/networks/"
-names = [ ["opsahl","ops","crimson","d"] , ["dblp", "dbl", "green","d"], ["talk_eo", "eo" ,"olive","d"],
+names = [ ["college","col","crimson","d"] , ["dblp", "dbl", "green","d"], ["talk_eo", "eo" ,"olive","d"],
           ["email-eu3", "eu3", "yellow","d"], ["email-eu2", "eu2", "magenta","d"], 
           ["racoon", "rac", "brown","u"], ["primate","pri",  "blue","u"],  ["workplace_2013", "wp", "black","u"],
            ["ht09", "ht","red","u"], ["weaver", "wea",  "pink","u"] ]
