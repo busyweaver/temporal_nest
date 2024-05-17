@@ -609,3 +609,72 @@ def statistics_rewirings_clus(path,names,cut,nb_rewire,folder, folder_res, iter_
 nb_rewire = 2
 nb_pandemy = 1
 statistics_rewirings_clus(path,names,cut,nb_rewire, folder, folder_res, nb_pandemy)
+
+
+def statistics_triangles(path,names,cut,nb_rewire,folder, folder_res, iter_pandemy, wl_it = -1,look_ahead = 1):
+    print("stats rewirings")
+    files = [f for f in os.listdir(folder_res) if os.path.isfile(folder_res+f)]
+    for zz in ["1","conv"]:
+        s = "table_triangles_"+zz+".tex"
+        # s2 = "table_diff_"+str(iter_pandemy)+".tex"
+        if s not in files:
+            fg = open(folder_res+s, "w")
+            # fg2 = open(folder_res+s2, "w")
+            for k in range(0,len(names)):
+                print("statistics_rewirings",  names[k][0])
+                g = read_graph(path,names[k][0], names[k][-1])
+                g_new = graph_cut(g,names[k][-1], cut)
+                m = max(events(g_new))
+                names_keep = folder+names[k][1]+"_"+str(1)+"_"+str(cut)+"_keep"
+                max_wl = find_max_wl(folder, names_keep)
+                # if want max iteration do this
+                if zz == "1":
+                    col = read_dic(names_keep+"_"+str(max_wl))
+                else:
+                    col = read_dic(names_keep+"_"+str(1))
+                nb = 1
+                if nb != 0:
+                    m = len(g_new)
+                    clus = [[],[],[]]
+                    for z in range(nb_graphs):
+                        print("randomize iteration number ", z+1)
+                        ll = randomize(g_new,int(nb_rewire*m*math.log(m)),col,names[k][-1])
+                        for ii in range(3):
+                            clus[ii].append(float(average_clustering_network_imp(ll[ii])))
+                            print("clust ok")
+
+                    av_clus = [ sum(clus[ii])/nb_graphs  for ii in range(3)]
+
+
+                    if nb_graphs > 1:
+                        dev_clus = [ math.sqrt(sum( (clus[ii][jj]-av_clus[ii])**2 for jj in range(len(clus[ii]))  )/(nb_graphs - 1))  for ii in range(3)]
+                        dev_clus = [0] + dev_clus
+
+                    else:
+                        dev_clus = [ 0  for ii in range(3)]
+                        dev_clus = [0] + dev_clus
+
+
+                    av_clus = [float(triangle_improved(g_new))] + av_clus
+                    print("clus orig ok")
+
+
+                    fg.write(names[k][1])
+                    for e in range(4):
+                        fg.write(" & $ "+str(av_clus[e])[:5]+" $,")
+
+                    fg.write("\\\\ \n")
+
+                    for e in range(4):
+                        fg.write(" & $ "+str(dev_clus[e])[:5]+" $,")
+                        print("clust ok")
+                    fg.write("\\\\ \n")
+
+
+            fg.close()
+            # fg2.close()
+        else:
+            print("file statistics_rewirings already present")
+
+nb_rewire = 2
+statistics_triangles(path,names,cut,nb_rewire, folder, folder_res, nb_pandemy)

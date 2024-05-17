@@ -45,6 +45,35 @@ def is_undirected(g):
             return False
     return True
 
+def to_aggregated(g):
+    res = set()
+    d = dict()
+    for e in g:
+        if (e[0],e[1]) in d:
+            d[(e[0],e[1])] += 1
+        else:
+            d[(e[0],e[1])] = 1
+    for e in d.keys():
+        res.add((e[0],e[1],d[e]))
+    return res
+
+
+
+def triangle_improved(g):
+    d = dict()
+    for e in g:
+        if e[0] not in d:
+            d[e[0]] = {(e[1],e[2])}
+        else:
+            d[e[0]].add((e[1],e[2]))
+    nb = 0
+    for (u,v,mul) in g.edges():
+        for (w,mul2) in d[u].intersection(d[v]):
+            if v < w:
+                nb += mul*mul2
+    return nb
+
+
 def to_undirected(g):
     gs = set(g)
     gn = set()
