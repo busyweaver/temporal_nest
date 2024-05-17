@@ -612,7 +612,7 @@ statistics_rewirings_clus(path,names,cut,nb_rewire, folder, folder_res, nb_pande
 
 
 def statistics_triangles(path,names,cut,nb_rewire,folder, folder_res, iter_pandemy, wl_it = -1,look_ahead = 1):
-    print("stats rewirings")
+    print("stats triangles")
     files = [f for f in os.listdir(folder_res) if os.path.isfile(folder_res+f)]
     for zz in ["1","conv"]:
         s = "table_triangles_"+zz+".tex"
@@ -655,7 +655,7 @@ def statistics_triangles(path,names,cut,nb_rewire,folder, folder_res, iter_pande
                         dev_clus = [0] + dev_clus
 
 
-                    av_clus = [float(triangle_improved(g_new))] + av_clus
+                    av_clus = [float(triangle_improved(to_aggregated(g_new)))] + av_clus
                     print("clus orig ok")
 
 
