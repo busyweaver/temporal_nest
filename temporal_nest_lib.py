@@ -67,7 +67,7 @@ def triangle_improved(g):
         else:
             d[e[0]].add((e[1],e[2]))
     nb = 0
-    for (u,v,mul) in g.edges():
+    for (u,v,mul) in g:
         for (w,mul2) in d[u].intersection(d[v]):
             if v < w:
                 nb += mul*mul2
