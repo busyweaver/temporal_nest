@@ -61,13 +61,18 @@ def to_aggregated(g):
 
 def triangle_improved(g):
     d = { v: set() for v in nodes(g)  }
+    d_mul = dict()
     for e in g:
-        d[e[0]].add((e[1],e[2]))
+        d[e[0]].add(e[1])
+        d_mul[(e[0],e[1])] = e[2]
+
     nb = 0
     for (u,v,mul) in g:
-        for (w,mul2) in d[u].intersection(d[v]):
+        for w in d[u].intersection(d[v]):
             if v < w:
-                nb += mul*mul2
+                mul2 = d_mul[(u,w)]
+                mul3 = d_mul[(v,w)]
+                nb += mul*mul2*mul3
     return nb
 
 
