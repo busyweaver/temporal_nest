@@ -60,12 +60,9 @@ def to_aggregated(g):
 
 
 def triangle_improved(g):
-    d = dict()
+    d = { v: set() for v in nodes(g)  }
     for e in g:
-        if e[0] not in d:
-            d[e[0]] = {(e[1],e[2])}
-        else:
-            d[e[0]].add((e[1],e[2]))
+        d[e[0]].add((e[1],e[2]))
     nb = 0
     for (u,v,mul) in g:
         for (w,mul2) in d[u].intersection(d[v]):
