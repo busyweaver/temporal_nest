@@ -640,7 +640,7 @@ def statistics_triangles(path,names,cut,nb_rewire,folder, folder_res, iter_pande
                         print("randomize iteration number ", z+1)
                         ll = randomize(g_new,int(nb_rewire*m*math.log(m)),col,names[k][-1])
                         for ii in range(3):
-                            clus[ii].append(float(triangle_improved(to_aggregated(ll[ii]))))
+                            clus[ii].append(float(triangle_naive(to_aggregated(ll[ii]))))
                             print("clust ok")
 
                     av_clus = [ sum(clus[ii])/nb_graphs  for ii in range(3)]
@@ -655,7 +655,7 @@ def statistics_triangles(path,names,cut,nb_rewire,folder, folder_res, iter_pande
                         dev_clus = [0] + dev_clus
 
 
-                    av_clus = [float(triangle_improved(to_aggregated(g_new)))] + av_clus
+                    av_clus = [float(triangle_naive(to_aggregated(g_new)))] + av_clus
                     print("clus orig ok")
 
 

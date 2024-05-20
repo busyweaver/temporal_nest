@@ -75,6 +75,25 @@ def triangle_improved(g):
                 nb += mul*mul2*mul3
     return nb
 
+def triangle_naive(g,d):
+    nb = 0
+    V = nodes(g)
+    d = { v: set() for v in V  }
+    d_mul = dict()
+    for e in g:
+        d[e[0]].add(e[1])
+        d_mul[(e[0],e[1])] = e[2]
+    for v in V:
+        for u1 in d[v]:
+            for u2 in d[u1]:
+                if u1 != u2:
+                    if v in d[u2]:
+                        mul = d_mul[(v,u1)]
+                        mul2 = d_mul[(u1,u2)]
+                        mul3 = d_mul[(u2,v)]
+                        nb += mul*mul2*mul3
+    return nb/3
+
 
 def to_undirected(g):
     gs = set(g)
