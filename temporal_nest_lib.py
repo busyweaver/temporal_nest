@@ -75,7 +75,7 @@ def triangle_improved(g):
                 nb += mul*mul2*mul3
     return nb
 
-def triangle_naive(g,d):
+def triangle_naive(g):
     nb = 0
     V = nodes(g)
     d = { v: set() for v in V  }
