@@ -212,7 +212,7 @@ def write_characteristics_table(folder, folder_values, names, cut, ma = True):
     files = [f for f in os.listdir(folder) if os.path.isfile(folder+f)]
     s = "table_gen"+str(ma)+".tex"
     if s not in files:
-        fg = open(folder+"table_gen.tex", "w")
+        fg = open(folder+s, "w")
         for k in range(len(names)):
             e = names[k]
             g = read_graph(path,e[0],e[-1])
