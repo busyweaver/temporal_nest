@@ -208,9 +208,9 @@ stats_numberrewirings_conv(path, names, look_aheads, iterations, cut, folder)
 
 
 # write properties
-def write_characteristics_table(folder, folder_values, names, cut):
+def write_characteristics_table(folder, folder_values, names, cut, ma = True):
     files = [f for f in os.listdir(folder) if os.path.isfile(folder+f)]
-    s = "table_gen.tex"
+    s = "table_gen"+str(ma)+".tex"
     if s not in files:
         fg = open(folder+"table_gen.tex", "w")
         for k in range(len(names)):
@@ -224,14 +224,18 @@ def write_characteristics_table(folder, folder_values, names, cut):
             rew_dic = read_dic(folder_values+e[1]+"_"+str(1)+"_"+str(cut)+"_rewire")
             exec_dic = read_dic(folder_values+e[1]+"_"+str(1)+"_"+str(cut)+"_exec_time")
             name_keep = folder_values+names[k][1]+"_"+str(1)+"_"+str(cut)+"_keep"
-            m = find_max_wl(folder_values, name_keep)
+            if ma:
+                m = find_max_wl(folder_values, name_keep)
+            else:
+                m = 1
             #m = max(rew_dic.keys())
             fg.write(e[1]+" & "+ e[3]+ " & " +str(nb_nodes)+" & "+str(len(ev))+
                      " & "+str(nb_temp_edges)+" & "+str(m)+ " & " +str(exec_dic[1])[:5] + " & "+ str(rew_dic[m])+ "\\\\ \n")
         fg.close()
     else:
         print("table gen already present")
-write_characteristics_table(folder_res, folder, names, cut)
+write_characteristics_table(folder_res, folder, names, cut, True)
+write_characteristics_table(folder_res, folder, names, cut, False)
 
 
 # In[13]:
