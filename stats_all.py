@@ -461,7 +461,7 @@ def statistics_rewirings_clus(path,names,cut,nb_rewire,folder, folder_res, iter_
                 # eff_d = [[],[],[]]
                 for z in range(nb_graphs):
                     print("randomize iteration number ", z+1)
-                    ll = randomize(g_new,int(nb_rewire*m*math.log(m)),col,col2names[k][-1])
+                    ll = randomize(g_new,int(nb_rewire*m*math.log(m)),col,col2,names[k][-1])
                     for ii in range(len(clus)):
                         clus[ii].append(float(average_clustering_network_imp(ll[ii])))
                         print("clust ok")
