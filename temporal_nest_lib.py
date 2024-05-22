@@ -1348,7 +1348,7 @@ def node_static(g):
     return res
 
 
-def randomize(g,n,col,dire):
+def randomize(g,n,col,col2,dire):
 #     print("start ****")
     g_tmp = g[:]
     if dire == "u":
@@ -1358,10 +1358,17 @@ def randomize(g,n,col,dire):
         g1 = felix_flips_imp(g,n,col)
         #g1 = felix_flips(g,n,col)
     print("fin g1")
-    g2 = randomized_edge_same_time_gen(g,dire, n)
+    if dire == "u":
+        g2 = rewire_any_imp(g,col2, dire, n)
+        #g1 = rewire_any(g,n,col,dire)
+    else:
+        g2 = felix_flips_imp(g,n,col2)
+        #g1 = felix_flips(g,n,col)
+    print("fin g2")
+    g3 = randomized_edge_same_time_gen(g,dire, n)
     print("fin g2")
     # here i dont use uniform colors in the undirected case because thre would be a lot of of saved edges. 
-    g3 = randomized_edge_gen(g,dire,n)
-    print("fin g3")
+    g4 = randomized_edge_gen(g,dire,n)
+    print("fin g4")
     return g1, g2, g3
 
