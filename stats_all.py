@@ -630,5 +630,5 @@ def statistics_triangles(path,names,cut,nb_rewire,folder, folder_res, iter_pande
         else:
             print("file statistics_rewirings already present")
 
-nb_rewire = 2
-statistics_triangles(path,names,cut,nb_rewire, folder, folder_res, nb_pandemy)
+#nb_rewire = 2
+#statistics_triangles(path,names,cut,nb_rewire, folder, folder_res, nb_pandemy)
