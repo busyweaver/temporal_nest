@@ -518,6 +518,7 @@ def statistics_rewirings_clus(path,names,cut,nb_rewire,folder, folder_res, iter_
                 # for e in range(4):
                 #     fg.write(" & $ "+str(av_eff_d[e])[:5]+" $ ,")
                 fg.write("\\\\ \n")
+                fg2.write("\\\\ \n")
 
                 for e in range(len(clus)+1):
                     fg.write(" & $ "+str(dev_clus[e])[:5]+" $,")
@@ -530,6 +531,7 @@ def statistics_rewirings_clus(path,names,cut,nb_rewire,folder, folder_res, iter_
                 #     fg.write(" & $ "+str(dev_eff_d[e])[:5]+" $ ,")
                 #     print("effi dur ok")
                 fg.write("\\\\ \n")
+                fg2.write("\\\\ \n")
 
                 # DIFFUSIONS
                 # l = [g_new,x,y,z]
