@@ -1370,5 +1370,5 @@ def randomize(g,n,col,col2,dire):
     # here i dont use uniform colors in the undirected case because thre would be a lot of of saved edges. 
     g4 = randomized_edge_gen(g,dire,n)
     print("fin g4")
-    return g1, g2, g3
+    return g1, g2, g3, g4
 
