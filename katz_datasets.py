@@ -70,12 +70,12 @@ def read_graph(path,s, dire):
     return g
 
 def SAE(s,s2):
-    print(s)
-    l = list(map(lambda x : x[0], s.tolist()))
-    l2 = list(map(lambda x : x[0], s2.tolist()))
+    # print(s, s[0])
+    # l = list(map(lambda x : x[0], s.tolist()))
+    # l2 = list(map(lambda x : x[0], s2.tolist()))
     val = 0
     for i in range(len(l)):
-        val += abs( l[i] - l2[i] )
+        val += abs( s[i] - s2[i] )
     return val/len(l)
 
 
