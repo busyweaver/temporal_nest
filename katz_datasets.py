@@ -106,7 +106,7 @@ for i in range(1):
         G = SparseTempFastGraph.from_temporal_edges(edges, is_directed=False)
     s = calc_temp_katz_iter(G, alpha=0.01, kind="broadcast")
     print("s",s)
-    z = 1
+    z = 0
     col = None
     while z <= dep+1:
         nam = folder+names[i][1]+"_1_1.0_keep_"+ str(z)
@@ -116,7 +116,7 @@ for i in range(1):
             
             
         if z == 0:
-            g2 = gc.rewire_any(g,len(g)*math.ceil(math.log(len(g))),{ (v,t):1 for v in gc.nodes(g) for t in gc.events(g) },direc)
+            g2 = gc.rewire_any(g,len(g)*math.ceil(math.log(len(g))),{ (v,t):1 for v in gc.nodes(g) for t in gc.events(g) },names[i][-1])
         else:
             g2 = gc.rewire_any(g,len(g)*math.ceil(math.log(len(g))),col,names[i][-1])
             
