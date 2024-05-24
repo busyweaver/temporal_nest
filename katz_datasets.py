@@ -91,7 +91,7 @@ fold_d = "datasets/networks/"
 folder = "values_graphs/"
 dep = 5
 d = dict()
-for i in range(1):
+for i in range(len(names)):
     print(names[i])
 #     cur = fold_d + names[i][0]+".csv"
     d[names[i][1]] = dict()
