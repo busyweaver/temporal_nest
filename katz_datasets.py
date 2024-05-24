@@ -92,7 +92,7 @@ for i in range(len(names)):
     new_g = [  [dv[e[0]],dv[e[1]],e[2]]    for e in g ]
     edges = np.array(new_g)
     if names[i][-1] == "d":
-        G = SparseTempFastGraph.from_temporal_edges(edges, is_directed=True)
+        G = SparseTempFastGraph.from_temporal_edges(edges, is_directed=False)
     else:
         G = SparseTempFastGraph.from_temporal_edges(edges, is_directed=False)
     s = calc_temp_katz_iter(G, alpha=0.01, kind="broadcast")
@@ -117,7 +117,7 @@ for i in range(len(names)):
         edges = np.array(new_g)
         edges = np.array(new_g)
         if names[i][-1] == "d":
-            G = SparseTempFastGraph.from_temporal_edges(edges, is_directed=True)
+            G = SparseTempFastGraph.from_temporal_edges(edges, is_directed=False)
         else:
             G = SparseTempFastGraph.from_temporal_edges(edges, is_directed=False)
 
