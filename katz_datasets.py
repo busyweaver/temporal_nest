@@ -104,7 +104,7 @@ for i in range(len(names)):
     z = 1
     col = None
     while z <= dep:
-        nam = folder+names[i][1]+"_1_"+str(z)
+        nam = folder+names[i][1]+"_1_1.0_keep_"+ str(z)
         print(nam)
         if os.path.isfile(nam+".pkl"):
             col = read_dic(nam)
