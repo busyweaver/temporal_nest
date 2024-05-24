@@ -74,7 +74,7 @@ def SAE(s,s2):
     # l = list(map(lambda x : x[0], s.tolist()))
     # l2 = list(map(lambda x : x[0], s2.tolist()))
     val = 0
-    for i in range(len(l)):
+    for i in range(len(s)):
         val += abs( s[i] - s2[i] )
     return val/len(l)
 
