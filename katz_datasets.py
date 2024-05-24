@@ -69,14 +69,17 @@ def read_graph(path,s, dire):
                 g.add( (v,u,int(t)) )
     return g
 
-def SAE(s,s2):
+def SAE(s,s2,dv_rev,dv2):
     # print(s, s[0])
     # l = list(map(lambda x : x[0], s.tolist()))
     # l2 = list(map(lambda x : x[0], s2.tolist()))
     val = 0
     print("sae len(s)",len(s), "len(s2)", len(s2))
     for i in range(len(s)):
-        val += abs( s[i] - s2[i] )
+        v = dv_rev[i]
+        if v in dv2.keys():
+            k = dv2[v]
+            val += abs( s[i] - s2[k] )
     print("val",val)
     return val/len(s)
 
@@ -95,8 +98,10 @@ for i in range(1):
     g = read_graph(fold_d,names[i][0]+".csv", names[i][-1])
     V = list(gc.nodes(g))
     dv = dict()
+    dv_rev = dict()
     for j in range(len(V)):
         dv[V[j]] = j
+        dv_rev[j] = V[j]
     new_g = [  [dv[e[0]],dv[e[1]],e[2]]    for e in g ]
     print("new_g", new_g[:10])
     edges = np.array(new_g)
@@ -123,11 +128,12 @@ for i in range(1):
             else:
                 g2 = gc.rewire_any_imp(g,col,names[i][-1],len(g)*math.ceil(math.log(len(g))))
 
-        V = list(gc.nodes(g2))
-        dv = dict()
-        for j in range(len(V)):
-            dv[V[j]] = j
-        new_g = [  [dv[e[0]],dv[e[1]],e[2]]    for e in g2 ]
+        V2 = list(gc.nodes(g2))
+        dv2 = dict()
+        for j in range(len(V2)):
+            dv2[V2[j]] = j
+
+        new_g = [  [dv2[e[0]],dv2[e[1]],e[2]]    for e in g2 ]
         edges = np.array(new_g)
 
         if names[i][-1] == "d":
@@ -137,7 +143,7 @@ for i in range(1):
 
         s2 = calc_temp_katz_iter(G, alpha=0.01, kind="broadcast")
         print("s2",s2)
-        d[names[i][1]][z] = SAE(s,s2)
+        d[names[i][1]][z] = SAE(s,s2,dv_rev, dv2)
         
         z += 1
     
