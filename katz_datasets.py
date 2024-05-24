@@ -76,7 +76,7 @@ def SAE(s,s2):
     val = 0
     for i in range(len(s)):
         val += abs( s[i] - s2[i] )
-    return val/len(l)
+    return val/len(s)
 
 
 # In[15]:
