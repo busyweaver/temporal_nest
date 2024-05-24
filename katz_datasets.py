@@ -108,7 +108,7 @@ for i in range(1):
     print("s",s)
     z = 0
     col = None
-    while z <= dep+1:
+    while z < dep+1:
         nam = folder+names[i][1]+"_1_1.0_keep_"+ str(z)
         print(nam)
         if os.path.isfile(nam+".pkl"):
@@ -118,8 +118,11 @@ for i in range(1):
         if z == 0:
             g2 = gc.randomized_edge_same_time_gen(g,names[i][-1],len(g)*math.ceil(math.log(len(g))))
         else:
-            g2 = gc.rewire_any(g,len(g)*math.ceil(math.log(len(g))),col,names[i][-1])
-            
+            if names[i][-1] == "d":
+                g2 = gc.felix_flips_imp(g,len(g)*math.ceil(math.log(len(g))),col)
+            else:
+                g2 = gc.rewire_any_imp(g,col,names[i][-1],len(g)*math.ceil(math.log(len(g))))
+
         V = list(gc.nodes(g2))
         dv = dict()
         for j in range(len(V)):
