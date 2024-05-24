@@ -3,6 +3,10 @@
 
 # In[1]:
 
+#need to install
+# https://github.com/Feelx234/nestmodel/tree/develop and
+# https://github.com/Feelx234/temp-nestmodel
+
 
 import graph_characteristics_lib as gc
 import numpy as np
@@ -87,7 +91,10 @@ for i in range(len(names)):
         dv[V[j]] = j
     new_g = [  [dv[e[0]],dv[e[1]],e[2]]    for e in g ]
     edges = np.array(new_g)
-    G = SparseTempFastGraph.from_temporal_edges(edges, is_directed=names[i][-1])
+    if names[i][-1] == "d":
+        G = SparseTempFastGraph.from_temporal_edges(edges, is_directed=True)
+    else:
+        G = SparseTempFastGraph.from_temporal_edges(edges, is_directed=False)
     s = calc_temp_katz_iter(G, alpha=0.01, kind="broadcast")
     z = 1
     col = None
@@ -109,7 +116,11 @@ for i in range(len(names)):
         new_g = [  [dv[e[0]],dv[e[1]],e[2]]    for e in g2 ]
         edges = np.array(new_g)
         edges = np.array(new_g)
-        G = SparseTempFastGraph.from_temporal_edges(edges, is_directed=names[i][-1])
+        if names[i][-1] == "d":
+            G = SparseTempFastGraph.from_temporal_edges(edges, is_directed=True)
+        else:
+            G = SparseTempFastGraph.from_temporal_edges(edges, is_directed=False)
+
         s2 = calc_temp_katz_iter(G, alpha=0.01, kind="broadcast")
         d[names[i][1]][z] = SAE(s,s2)
         
