@@ -116,7 +116,7 @@ for i in range(1):
             
             
         if z == 0:
-            g2 = gc.randomized_edge_same_time_gen(g,names[i][-1],len(g)*math.ceil(math.log(len(g))),{ (v,t):1 for v in gc.nodes(g) for t in gc.events(g) })
+            g2 = gc.randomized_edge_same_time_gen(g,names[i][-1],len(g)*math.ceil(math.log(len(g))))
         else:
             g2 = gc.rewire_any(g,len(g)*math.ceil(math.log(len(g))),col,names[i][-1])
             
