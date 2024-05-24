@@ -86,7 +86,7 @@ fold_d = "datasets/networks/"
 folder = "values_graphs/"
 dep = 6
 d = dict()
-for i in range(2):
+for i in range(1):
     print(names[i])
 #     cur = fold_d + names[i][0]+".csv"
     d[names[i][1]] = dict()
@@ -141,6 +141,8 @@ for i in range(2):
 
 import matplotlib.pyplot as plt
 import numpy as np
+
+print("res",d)
 
 # evenly sampled time at 200ms intervals
 x = [  de for de in range(0,dep+1) ]
