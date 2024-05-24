@@ -89,7 +89,7 @@ def SAE(s,s2,dv_rev,dv2):
 
 fold_d = "datasets/networks/"
 folder = "values_graphs/"
-dep = 6
+dep = 5
 d = dict()
 for i in range(1):
     print(names[i])
@@ -111,7 +111,7 @@ for i in range(1):
         G = SparseTempFastGraph.from_temporal_edges(edges, is_directed=False)
     s = calc_temp_katz_iter(G, alpha=0.01, kind="broadcast")
     print("s",s)
-    z = 1
+    z = 0
     col = None
     while z < dep+1:
         nam = folder+names[i][1]+"_1_1.0_keep_"+ str(z)
