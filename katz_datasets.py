@@ -9,6 +9,8 @@
 
 
 import graph_characteristics_lib as gc
+import os
+import sys
 import numpy as np
 from tnestmodel.temp_fast_graph import SparseTempFastGraph
 from tnestmodel.temp_centralities import calc_temp_katz_iter
