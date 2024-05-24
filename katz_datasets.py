@@ -74,7 +74,7 @@ def SAE(s,s2):
     # l = list(map(lambda x : x[0], s.tolist()))
     # l2 = list(map(lambda x : x[0], s2.tolist()))
     val = 0
-    print("sae len(s)",len(s))
+    print("sae len(s)",len(s), "len(s2)", len(s2))
     for i in range(len(s)):
         val += abs( s[i] - s2[i] )
     print("val",val)
@@ -106,7 +106,7 @@ for i in range(1):
         G = SparseTempFastGraph.from_temporal_edges(edges, is_directed=False)
     s = calc_temp_katz_iter(G, alpha=0.01, kind="broadcast")
     print("s",s)
-    z = 0
+    z = 1
     col = None
     while z < dep+1:
         nam = folder+names[i][1]+"_1_1.0_keep_"+ str(z)
@@ -129,7 +129,7 @@ for i in range(1):
             dv[V[j]] = j
         new_g = [  [dv[e[0]],dv[e[1]],e[2]]    for e in g2 ]
         edges = np.array(new_g)
-        edges = np.array(new_g)
+
         if names[i][-1] == "d":
             G = SparseTempFastGraph.from_temporal_edges(edges, is_directed=True)
         else:
