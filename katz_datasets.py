@@ -105,7 +105,7 @@ for i in range(2):
     s = calc_temp_katz_iter(G, alpha=0.01, kind="broadcast")
     z = 1
     col = None
-    while z <= dep:
+    while z <= dep+1:
         nam = folder+names[i][1]+"_1_1.0_keep_"+ str(z)
         print(nam)
         if os.path.isfile(nam+".pkl"):
