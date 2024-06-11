@@ -17,6 +17,15 @@ import numpy as np
 from tnestmodel.temp_fast_graph import SparseTempFastGraph
 from tnestmodel.temp_centralities import calc_temp_katz_iter
 
+def save_dic(s,d):
+    with open(s+".pkl","wb") as f:
+        pickle.dump(d,f)
+
+def read_dic(s):
+    with open(s+".pkl", 'rb') as f:
+        d = pickle.load(f)
+    return d
+
 
 # In[6]:
 
@@ -41,10 +50,6 @@ names = [ ["dnc","dnc","crimson","d"] , ["fb-forum", "fb", "green","d"], ["talk_
 # In[16]:
 
 
-def read_dic(s):
-    with open(s+".pkl", 'rb') as f:
-        d = pickle.load(f)
-    return d
 
 def find_sep(x):
     for s in x:
@@ -156,6 +161,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 print("res",d)
+
+save_dic("katz_dic",d)
 
 # evenly sampled time at 200ms intervals
 x = [  de for de in range(0,dep+1) ]
