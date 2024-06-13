@@ -513,8 +513,8 @@ def statistics_rewirings_clus(path,names,cut,nb_rewire,folder, folder_res, iter_
                 fg2.write(names[k][1])
 
                 for e in range(len(clus)+1):
-                    fg.write(" & $ "+str(av_clus[e])[:5]+" $,")
-                    fg2.write(" & $ "+str(av_tri[e])[:5]+" $,")
+                    fg.write(" & $ "+str(av_clus[e])+" $,")
+                    fg2.write(" & $ "+str(av_tri[e])+" $,")
                 # for e in range(4):
                 #     fg.write(" & $ "+str(av_eff_s[e])[:5]+" $ ,")
                 # for e in range(4):
@@ -523,8 +523,8 @@ def statistics_rewirings_clus(path,names,cut,nb_rewire,folder, folder_res, iter_
                 fg2.write("\\\\ \n")
 
                 for e in range(len(clus)+1):
-                    fg.write(" & $ "+str(dev_clus[e])[:5]+" $,")
-                    fg2.write(" & $ "+str(dev_tri[e])[:5]+" $,")
+                    fg.write(" & $ "+str(dev_clus[e])+" $,")
+                    fg2.write(" & $ "+str(dev_tri[e])+" $,")
                     print("clust tri ok")
                 # for e in range(4):
                 #     fg.write(" & $ "+str(dev_eff_s[e])[:5]+" $ ,")
