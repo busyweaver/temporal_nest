@@ -13,10 +13,8 @@ import math
 list_rewires = dict()
 
 path = "datasets/networks/"
-names = [ ["dnc","dnc","crimson","d"] , ["fb-forum", "fb", "green","d"], ["talk_eo", "eo" ,"olive","d"],
-          ["email-eu3", "eu3", "yellow","d"], ["email-eu2", "eu2", "magenta","d"], 
-          ["racoon", "rac", "brown","u"], ["primate","pri",  "blue","u"],  ["workplace_2013", "wp", "black","u"],
-           ["ht09", "ht","red","u"], ["weaver", "wea",  "pink","u"] ]
+names = [ ["weaver", "wea",  "pink","u"], ["ht09", "ht","red","u"], ["workplace_2013", "wp", "black","u"], ["primate","pri",  "blue","u"], ["racoon", "rac", "brown","u"], ["talk_eo", "eo" ,"olive","d"], ["dnc","dnc","crimson","d"] , ["fb-forum", "fb", "green","d"], 
+          ["email-eu2", "eu2", "magenta","d"], ["email-eu3", "eu3", "yellow","d"]     ]
 
 #names = [ ["opsahl", "opsahl", "black","d"], ["email-eu2", "eu2", "magenta","d"], ["dnc", "dnc", "brown","d"], ["email-eu3", "eu3", "yellow","d"], ["highschool_2011", "hs11", "purple","u"], ["hospital_ward", "hw", "blue","u"], ["ht09", "ht","red","u"], ["workplace_2013", "wp", "green","u"] ]
 look_aheads = [0.0,0.2,0.4,0.6,0.8,1]
@@ -446,6 +444,7 @@ def statistics_rewirings_clus(path,names,cut,nb_rewire,folder, folder_res, iter_
             print("statistics_rewirings",  names[k][0])
             g = read_graph(path,names[k][0], names[k][-1])
             g_new = graph_cut(g,names[k][-1], cut)
+            print("nb edges : ", len(g_new))
             m = max(events(g_new))
             names_keep = folder+names[k][1]+"_"+str(1)+"_"+str(cut)+"_keep"
             max_wl = find_max_wl(folder, names_keep)
@@ -497,10 +496,13 @@ def statistics_rewirings_clus(path,names,cut,nb_rewire,folder, folder_res, iter_
                     # dev_eff_d = [ 0  for ii in range(3)]
                     # dev_eff_d = [0] + dev_eff_d
 
-
-                av_clus = [float(average_clustering_network_imp(g_new))] + av_clus
+                x = float(average_clustering_network_imp(g_new))
+                print("value clus on original graph", x)
+                av_clus = [x] + av_clus
                 print("clus orig ok")
-                av_tri = [float(triangle_naive(to_aggregated(g_new)))] + av_tri
+                x = float(triangle_naive(to_aggregated(g_new)))
+                print("value tri on original graph", x)
+                av_tri = [x] + av_tri
                 print("tri orig ok")
                 # av_eff_s = [float(global_efficiency_cpp(g_new,"s")[0])] + av_eff_s
                 # print("eff shor orig ok")

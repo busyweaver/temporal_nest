@@ -92,7 +92,7 @@ def triangle_naive(g):
                         mul2 = d_mul[(u1,u2)]
                         mul3 = d_mul[(u2,v)]
                         nb += mul*mul2*mul3
-    return nb/3
+    return nb/6
 
 
 def to_undirected(g):
@@ -1352,23 +1352,25 @@ def randomize(g,n,col,col2,dire):
 #     print("start ****")
     g_tmp = g[:]
     if dire == "u":
-        g1 = rewire_any_imp(g,col, dire, n)
+        g1 = rewire_any_imp(g_tmp,col, dire, n)
         #g1 = rewire_any(g,n,col,dire)
     else:
-        g1 = felix_flips_imp(g,n,col)
+        g1 = felix_flips_imp(g_tmp,n,col)
         #g1 = felix_flips(g,n,col)
     print("fin g1")
+    g_tmp = g[:]
     if dire == "u":
-        g2 = rewire_any_imp(g,col2, dire, n)
+        g2 = rewire_any_imp(g_tmp,col2, dire, n)
         #g1 = rewire_any(g,n,col,dire)
     else:
-        g2 = felix_flips_imp(g,n,col2)
+        g2 = felix_flips_imp(g_tmp,n,col2)
         #g1 = felix_flips(g,n,col)
     print("fin g2")
-    g3 = randomized_edge_same_time_gen(g,dire, n)
+    g_tmp = g[:]
+    g3 = randomized_edge_same_time_gen(g_tmp,dire, n)
     print("fin g2")
     # here i dont use uniform colors in the undirected case because thre would be a lot of of saved edges. 
-    g4 = randomized_edge_gen(g,dire,n)
+    g4 = randomized_edge_gen(g_tmp,dire,n)
     print("fin g4")
     return g1, g2, g3, g4
 
