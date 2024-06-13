@@ -114,7 +114,7 @@ for i in range(len(names)):
         G = SparseTempFastGraph.from_temporal_edges(edges, is_directed=True)
     else:
         G = SparseTempFastGraph.from_temporal_edges(edges, is_directed=False)
-    s = calc_temp_katz_iter(G, alpha=0.01, kind="broadcast")
+    s = calc_temp_katz_iter(G, alpha=0.001, kind="broadcast")
     print("s",s)
     z = 0
     col = None
@@ -146,9 +146,9 @@ for i in range(len(names)):
         else:
             G = SparseTempFastGraph.from_temporal_edges(edges, is_directed=False)
 
-        s2 = calc_temp_katz_iter(G, alpha=0.01, kind="broadcast")
+        s2 = calc_temp_katz_iter(G, alpha=0.001, kind="broadcast")
         print("s2",s2)
-        d[names[i][1]][z] = SAE(s,s2,dv_rev, dv2)
+        d[names[i][1]][z] = SAE(s,s2,dv_rev, dv2) + math.pow(10,-16)
         
         z += 1
     
